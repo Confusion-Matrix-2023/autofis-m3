@@ -67,7 +67,10 @@ dependencies {
     implementation "com.google.accompanist:accompanist-navigation-animation:0.24.5-alpha"
     implementation "com.google.accompanist:accompanist-permissions:0.24.3-alpha"
 
-    implementation "androidx.core:core-splashscreen:1.0.0-rc01"
+    implementation "androidx.core:core-splashscreen:1.0.0-beta01"
+
+    // Timber for logging
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 
     // CameraX
     // TODO: remove irrelevant dependencies

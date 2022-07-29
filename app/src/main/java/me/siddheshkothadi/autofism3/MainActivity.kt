@@ -31,8 +31,8 @@ class MainActivity : ComponentActivity() {
         ExperimentalPermissionsApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         installSplashScreen()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
         setContent {

@@ -9,6 +9,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
+import timber.log.Timber
 
 class CustomImageAnalyzer(val drawBoundingBox: (rect: android.graphics.Rect, dLabel: DetectedObject.Label, imageHeight: Int, imageWidth: Int) -> Unit) :
     ImageAnalysis.Analyzer {
@@ -41,7 +42,7 @@ class CustomImageAnalyzer(val drawBoundingBox: (rect: android.graphics.Rect, dLa
                         if (detectedObject.labels.isNotEmpty()) {
                             for (label in detectedObject.labels) {
                                 drawBoundingBox(boundingBox, label, image.height, image.width)
-                                Log.i("Res", "${label.text} ${label.confidence} ${label.index}")
+                                Timber.i(label.text + " " + label.confidence + " " + label.index)
                             }
                         } else {
                             // TODO: Clear canvas
@@ -51,7 +52,7 @@ class CustomImageAnalyzer(val drawBoundingBox: (rect: android.graphics.Rect, dLa
                 .addOnFailureListener { e ->
                     // Task failed with an exception
                     // ...
-                    Log.i("Res", e.toString())
+                    Timber.i(e.toString())
                 }
                 .addOnCompleteListener {
                     imageProxy.close()

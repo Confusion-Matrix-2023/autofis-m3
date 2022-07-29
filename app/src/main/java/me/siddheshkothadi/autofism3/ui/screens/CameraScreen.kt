@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import me.siddheshkothadi.autofism3.CustomImageAnalyzer
+import timber.log.Timber
 
 @Composable
 fun CameraScreen(
@@ -208,7 +209,7 @@ fun CameraScreen(
                             }
 
                             override fun onError(exception: ImageCaptureException) {
-                                Log.e("Image Capture", exception.toString())
+                                Timber.tag("Image Capture").e(exception.toString())
                             }
                         }
                     )
