@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.media.Image
-import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -183,16 +182,24 @@ fun CameraScreen(
                 }) {
                     if (isFlashOn.value) Icon(
                         Icons.Filled.FlashOn,
-                        ""
-                    ) else Icon(Icons.Filled.FlashOff, "")
+                        "", tint = androidx.compose.ui.graphics.Color.White
+                    ) else Icon(
+                        Icons.Filled.FlashOff,
+                        "",
+                        tint = androidx.compose.ui.graphics.Color.White
+                    )
                 }
-                Text("AutoFIS", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "AutoFIS",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = androidx.compose.ui.graphics.Color.White
+                )
                 IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.Menu, "")
+                    Icon(Icons.Filled.Menu, "", tint = androidx.compose.ui.graphics.Color.White)
                 }
             }
 
-            Button(
+            ElevatedButton(
                 modifier = Modifier
                     .padding(12.dp)
                     .size(64.dp)

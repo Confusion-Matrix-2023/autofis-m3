@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainLayout() {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by remember { mutableStateOf(2) }
     val tabs = listOf("History", "Learn", "Capture", "Stats", "Settings")
 
     val filledIcons = listOf(
@@ -69,7 +69,7 @@ fun MainLayout() {
         when (selectedTab) {
             0 -> History(paddingValues)
             2 -> CameraScreen(paddingValues)
-            else -> History(paddingValues)
+            else -> EmptyScreen()
         }
     }
 }

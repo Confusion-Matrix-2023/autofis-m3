@@ -1,6 +1,7 @@
 package me.siddheshkothadi.autofism3
 
 import android.annotation.SuppressLint
+import android.graphics.Rect
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -36,17 +37,24 @@ class CustomImageAnalyzer(val drawBoundingBox: (rect: android.graphics.Rect, dLa
 
             objectDetector.process(image)
                 .addOnSuccessListener { detectedObjects ->
-                    for (detectedObject in detectedObjects) {
-                        val boundingBox = detectedObject.boundingBox
-                        val trackingId = detectedObject.trackingId
-                        if (detectedObject.labels.isNotEmpty()) {
-                            for (label in detectedObject.labels) {
-                                drawBoundingBox(boundingBox, label, image.height, image.width)
-                                Timber.i(label.text + " " + label.confidence + " " + label.index)
+                    if(detectedObjects.isNotEmpty()) {
+                        for (detectedObject in detectedObjects) {
+                            val boundingBox = detectedObject.boundingBox
+                            val trackingId = detectedObject.trackingId
+                            if (detectedObject.labels.isNotEmpty()) {
+                                for (label in detectedObject.labels) {
+                                    drawBoundingBox(boundingBox, label, image.height, image.width)
+                                    Timber.tag("Res")
+                                        .i(label.text + " " + label.confidence + " " + label.index)
+                                }
+                            } else {
+                                // TODO: Clear canvas
+                                drawBoundingBox(Rect(0,0,0,0), DetectedObject.Label("", 0f, 0), 0, 0)
                             }
-                        } else {
-                            // TODO: Clear canvas
                         }
+                    }
+                    else {
+                        drawBoundingBox(Rect(0,0,0,0), DetectedObject.Label("", 0f, 0), 0, 0)
                     }
                 }
                 .addOnFailureListener { e ->
