@@ -8,4 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="design_primary">#FF159DFF</color>
+
+    <color name="m3_surface">#FFEFF1F1</color>
+    <color name="m3_surface_dark">#FF191C1D</color>
+
 </resources>
