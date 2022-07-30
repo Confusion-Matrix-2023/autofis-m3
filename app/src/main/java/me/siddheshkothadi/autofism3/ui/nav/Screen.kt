@@ -16,7 +16,7 @@ sealed class Screen(
     object Capture : Screen("capture", R.string.capture, Icons.Outlined.Camera, Icons.Filled.Camera)
     object Camera : Screen("camera", R.string.capture, Icons.Outlined.Camera, Icons.Filled.Camera)
     object EnterDetails :
-        Screen("enterDetails", R.string.enterDetails, Icons.Outlined.Camera, Icons.Filled.Camera)
+        Screen("enter-details/{uri}", R.string.enterDetails, Icons.Outlined.Camera, Icons.Filled.Camera)
 
     object History :
         Screen("history", R.string.history, Icons.Outlined.History, Icons.Filled.History)

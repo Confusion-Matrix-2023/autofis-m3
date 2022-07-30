@@ -15,7 +15,12 @@ fun NavGraphBuilder.captureGraph(navController: NavHostController) {
             CameraScreen(navController)
         }
         composable(Screen.EnterDetails.route) {
-            EnterDetails()
+            navController.currentBackStackEntry?.arguments?.getString("uri")?.let { fishImageUri ->
+                EnterDetails(
+                    navController,
+                    fishImageUri
+                )
+            }
         }
     }
 }
