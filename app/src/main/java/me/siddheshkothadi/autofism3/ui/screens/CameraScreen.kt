@@ -11,11 +11,12 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.FlashOff
+import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.nativeCanvas
@@ -35,8 +36,9 @@ fun CameraScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
-    val camera = remember { mutableStateOf<Camera?>(null) }
-    val isFlashOn = remember { mutableStateOf(false) }
+    var camera by remember { mutableStateOf<Camera?>(null) }
+    var isFlashOn by remember { mutableStateOf(false) }
+    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
 
     val h = remember { mutableStateOf(0f) }
     val w = remember { mutableStateOf(0f) }
@@ -48,9 +50,6 @@ fun CameraScreen(
 
     val detectedLabel = remember { mutableStateOf("") }
     val accuracyText = remember { mutableStateOf("") }
-
-    val imageCapture = ImageCapture.Builder()
-        .build()
 
     Surface(
         modifier = Modifier
@@ -81,6 +80,10 @@ fun CameraScreen(
                                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                                 .build()
 
+                            imageCapture = ImageCapture.Builder()
+                                .setTargetRotation(previewView.display.rotation)
+                                .build()
+
                             val imageAnalysis = ImageAnalysis.Builder()
                                 .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -103,7 +106,7 @@ fun CameraScreen(
                                 }
 
                             cameraProvider.unbindAll()
-                            camera.value = cameraProvider.bindToLifecycle(
+                            camera = cameraProvider.bindToLifecycle(
                                 lifecycleOwner,
                                 cameraSelector,
                                 imageAnalysis,
@@ -163,21 +166,21 @@ fun CameraScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
-                    if (camera.value != null) {
-                        if (isFlashOn.value) {
-                            if (camera.value!!.cameraInfo.hasFlashUnit()) {
-                                camera.value!!.cameraControl.enableTorch(false)
-                                isFlashOn.value = false
+                    if (camera != null) {
+                        if (isFlashOn) {
+                            if (camera!!.cameraInfo.hasFlashUnit()) {
+                                camera!!.cameraControl.enableTorch(false)
+                                isFlashOn = false
                             }
                         } else {
-                            if (camera.value!!.cameraInfo.hasFlashUnit()) {
-                                camera.value!!.cameraControl.enableTorch(true)
-                                isFlashOn.value = true
+                            if (camera!!.cameraInfo.hasFlashUnit()) {
+                                camera!!.cameraControl.enableTorch(true)
+                                isFlashOn = true
                             }
                         }
                     }
                 }) {
-                    if (isFlashOn.value) Icon(
+                    if (isFlashOn) Icon(
                         Icons.Filled.FlashOn,
                         "", tint = androidx.compose.ui.graphics.Color.White
                     ) else Icon(
@@ -202,7 +205,7 @@ fun CameraScreen(
                     .size(64.dp)
                     .align(Alignment.BottomCenter),
                 onClick = {
-                    imageCapture.takePicture(
+                    imageCapture?.takePicture(
                         ContextCompat.getMainExecutor(context), // Defines where the callbacks are run
                         object : ImageCapture.OnImageCapturedCallback() {
                             @ExperimentalGetImage
@@ -210,8 +213,7 @@ fun CameraScreen(
                                 val image: Image? =
                                     imageProxy.image // Do what you want with the image
                                 imageProxy.close() // Make sure to close the image
-
-                                navController.navigate("enterDetails")
+                                Timber.i("Image captured $image")
                             }
 
                             override fun onError(exception: ImageCaptureException) {
