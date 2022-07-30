@@ -10,16 +10,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AppBar() {
+fun AppBar(
+    title: String,
+    containsBackButton: Boolean = false
+) {
     Surface(
-        tonalElevation = 3.dp, modifier = Modifier.windowInsetsPadding(
+        tonalElevation = 3.dp,
+        modifier = Modifier.windowInsetsPadding(
             WindowInsets.statusBars.only(
                 WindowInsetsSides.Top
             )
         )
     ) {
         CenterAlignedTopAppBar(
-            title = { Text("History") }
+            title = { Text(title) }
         )
     }
 }

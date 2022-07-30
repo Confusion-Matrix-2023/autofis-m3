@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.CustomImageAnalyzer
 import me.siddheshkothadi.autofism3.utils.getBitmap
 import me.siddheshkothadi.autofism3.utils.getUri
@@ -40,6 +43,8 @@ fun CameraScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
+
+    val coroutineScope = rememberCoroutineScope()
 
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     var camera by remember { mutableStateOf<Camera?>(null) }
@@ -69,7 +74,7 @@ fun CameraScreen(
             ),
         color = MaterialTheme.colorScheme.background
     ) {
-        Box() {
+        Box {
             Box {
                 AndroidView(
                     factory = { ctx ->
@@ -213,33 +218,43 @@ fun CameraScreen(
                     .size(64.dp)
                     .align(Alignment.BottomCenter),
                 onClick = {
-                    imageCapture?.takePicture(
-                        ContextCompat.getMainExecutor(context),
-                        object : ImageCapture.OnImageCapturedCallback() {
-                            @ExperimentalGetImage
-                            override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                                Timber.i("Clicked")
-                                isLoading = true
-                                val bitmap = imageProxy.getBitmap()
-                                val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}.jpg")
-                                imageFile.storeBitmap(context, bitmap)
-                                val fishImageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
-                                isLoading = false
-                                navController.navigate("enter-details/$fishImageUri")
-                                imageProxy.close()
-                            }
+                    coroutineScope.launch {
+                        withContext(Dispatchers.IO) {
+                            isLoading = true
+                            imageCapture?.takePicture(
+                                ContextCompat.getMainExecutor(context),
+                                object : ImageCapture.OnImageCapturedCallback() {
+                                    @ExperimentalGetImage
+                                    override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                                        Timber.i("Clicked")
+                                        isLoading = true
+                                        val bitmap = imageProxy.getBitmap()
+                                        val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}.jpg")
+                                        imageFile.storeBitmap(context, bitmap)
+                                        val fishImageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
+                                        isLoading = false
+                                        navController.navigate("enter-details/$fishImageUri")
+                                        imageProxy.close()
+                                    }
 
-                            override fun onError(exception: ImageCaptureException) {
-                                Timber.tag("Image Capture").e(exception.toString())
-                            }
+                                    override fun onError(exception: ImageCaptureException) {
+                                        Timber.tag("Image Capture").e(exception.toString())
+                                        isLoading = false
+                                    }
+                                }
+                            )
                         }
-                    )
+                    }
                 },
                 enabled = !isLoading,
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp)
             ) {
                 Icon(Icons.Filled.CameraAlt, "Camera")
+            }
+
+            if(isLoading) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center), color = androidx.compose.ui.graphics.Color(0xffffffff))
             }
         }
     }

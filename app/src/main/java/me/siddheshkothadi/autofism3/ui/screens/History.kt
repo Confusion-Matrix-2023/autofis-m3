@@ -15,10 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import me.siddheshkothadi.autofism3.ui.components.AppBar
+import me.siddheshkothadi.autofism3.ui.nav.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +29,7 @@ fun History(
 ) {
     Scaffold(
         topBar = {
-            AppBar()
+            AppBar(stringResource(id = Screen.History.resourceId))
         },
     ) {
         LazyColumn(
