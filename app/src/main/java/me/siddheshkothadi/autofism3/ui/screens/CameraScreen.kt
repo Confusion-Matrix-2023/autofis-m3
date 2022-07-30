@@ -11,10 +11,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.FlashOff
-import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -27,12 +24,13 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
 import me.siddheshkothadi.autofism3.CustomImageAnalyzer
 import timber.log.Timber
 
 @Composable
 fun CameraScreen(
-    paddingValues: PaddingValues
+    navController: NavHostController
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
@@ -57,7 +55,6 @@ fun CameraScreen(
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
             .windowInsetsPadding(
                 WindowInsets.statusBars.only(
                     WindowInsetsSides.Top
@@ -195,7 +192,7 @@ fun CameraScreen(
                     color = androidx.compose.ui.graphics.Color.White
                 )
                 IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.Menu, "", tint = androidx.compose.ui.graphics.Color.White)
+                    Icon(Icons.Filled.MoreVert, "", tint = androidx.compose.ui.graphics.Color.White)
                 }
             }
 
@@ -213,6 +210,8 @@ fun CameraScreen(
                                 val image: Image? =
                                     imageProxy.image // Do what you want with the image
                                 imageProxy.close() // Make sure to close the image
+
+                                navController.navigate("enterDetails")
                             }
 
                             override fun onError(exception: ImageCaptureException) {

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">AutoFIS</string>
+    <string name="history">History</string>
+    <string name="learn">Learn</string>
+    <string name="capture">Capture</string>
+    <string name="stats">Stats</string>
+    <string name="settings">Settings</string>
+    <string name="enterDetails">Enter Details</string>
+    <string name="camera">Camera</string>
 </resources>

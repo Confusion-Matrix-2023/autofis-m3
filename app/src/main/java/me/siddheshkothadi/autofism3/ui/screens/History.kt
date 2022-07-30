@@ -24,13 +24,11 @@ import me.siddheshkothadi.autofism3.ui.components.AppBar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun History(
-    paddingValues: PaddingValues
 ) {
     Scaffold(
         topBar = {
             AppBar()
         },
-        modifier = Modifier.padding(paddingValues)
     ) {
         LazyColumn(
             modifier = Modifier.padding(12.dp),
