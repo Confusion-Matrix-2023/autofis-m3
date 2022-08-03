@@ -8,9 +8,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.siddheshkothadi.autofism3.FishApplication
+import me.siddheshkothadi.autofism3.database.DataStoreRepositoryImpl
 import me.siddheshkothadi.autofism3.database.FishDatabase
 import me.siddheshkothadi.autofism3.database.FishRepositoryImpl
 import me.siddheshkothadi.autofism3.network.FileAPI
+import me.siddheshkothadi.autofism3.repository.DataStoreRepository
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -56,5 +58,11 @@ object AppModule {
     @Provides
     fun provideFishRepository(fishDatabase: FishDatabase, fileAPI: FileAPI): FishRepository {
         return FishRepositoryImpl(fishDatabase.fishDAO(), fileAPI)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDataStoreRepository(appContext: FishApplication): DataStoreRepository {
+        return DataStoreRepositoryImpl(appContext)
     }
 }

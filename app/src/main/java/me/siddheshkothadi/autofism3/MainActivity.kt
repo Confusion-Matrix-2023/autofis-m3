@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,21 +25,31 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import dagger.hilt.android.AndroidEntryPoint
 import me.siddheshkothadi.autofism3.ui.nav.Screen
 import me.siddheshkothadi.autofism3.ui.nav.captureGraph
-import me.siddheshkothadi.autofism3.ui.screens.CameraScreen
-import me.siddheshkothadi.autofism3.ui.screens.EmptyScreen
-import me.siddheshkothadi.autofism3.ui.screens.History
+import me.siddheshkothadi.autofism3.ui.screen.EmptyScreen
+import me.siddheshkothadi.autofism3.ui.screen.History
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
+import me.siddheshkothadi.autofism3.ui.viewmodel.MainViewModel
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    private val mainViewModel: MainViewModel by viewModels()
+
     @OptIn(
         ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
         ExperimentalPermissionsApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        installSplashScreen()
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                mainViewModel.deviceId.value.isNullOrBlank()
+            }
+        }
         super.onCreate(savedInstanceState)
 
         setContent {

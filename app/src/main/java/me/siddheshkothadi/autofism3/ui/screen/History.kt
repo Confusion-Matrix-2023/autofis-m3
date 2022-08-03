@@ -1,4 +1,4 @@
-package me.siddheshkothadi.autofism3.ui.screens
+package me.siddheshkothadi.autofism3.ui.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,9 +16,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
-import me.siddheshkothadi.autofism3.ui.components.AppBar
+import me.siddheshkothadi.autofism3.ui.component.AppBar
 import me.siddheshkothadi.autofism3.ui.nav.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

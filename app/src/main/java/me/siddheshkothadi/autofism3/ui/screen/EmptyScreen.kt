@@ -1,4 +1,4 @@
-package me.siddheshkothadi.autofism3.ui.screens
+package me.siddheshkothadi.autofism3.ui.screen
 
 import androidx.compose.runtime.Composable
 
