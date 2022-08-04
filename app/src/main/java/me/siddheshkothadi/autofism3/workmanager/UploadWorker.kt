@@ -1,12 +1,9 @@
 package me.siddheshkothadi.autofism3.workmanager
 
 import UploadStreamRequestBody
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
-import android.webkit.MimeTypeMap
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
@@ -40,7 +37,7 @@ class UploadWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            val imageUri = inputData.getString("IMAGE_URI") ?: return Result.failure()
+            val imageUri = inputData.getString(IMAGE_URI) ?: return Result.failure()
 
             Timber.i("ImageUri: $imageUri")
 
@@ -74,7 +71,7 @@ class UploadWorker @AssistedInject constructor(
         setForegroundAsync(
             ForegroundInfo(
                 id,
-                NotificationCompat.Builder(context, "upload_channel")
+                NotificationCompat.Builder(context, CHANNEL_ID)
                     .setOnlyAlertOnce(true)
                     .setSmallIcon(R.drawable.ic_baseline_cloud_upload_24)
                     .setLargeIcon(image)
@@ -113,10 +110,15 @@ class UploadWorker @AssistedInject constructor(
                 requestTimestamp
             )
         } catch (exception: Exception) {
-            Timber.e("Here lol")
             Timber.e(exception.toString())
-            Result.retry()
             throw exception
         }
+    }
+
+    companion object {
+        const val GROUP_KEY = "me.siddheshkothadi.autofism3.FILE_UPLOAD"
+        const val SUMMARY_ID = 0
+        const val CHANNEL_ID = "upload_channel"
+        const val IMAGE_URI = "IMAGE_URI"
     }
 }

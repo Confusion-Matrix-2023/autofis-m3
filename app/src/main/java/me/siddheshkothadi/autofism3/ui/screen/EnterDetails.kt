@@ -1,6 +1,8 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
 import android.net.Uri
+import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,8 +44,8 @@ fun EnterDetails(
 ) {
     val isLoading by remember { enterDetailsViewModel.isLoading }
     val quantity by remember { enterDetailsViewModel.quantity }
-    val latitude by remember {  enterDetailsViewModel.latitude }
-    val longitude by remember {  enterDetailsViewModel.longitude }
+    val latitude by remember { enterDetailsViewModel.latitude }
+    val longitude by remember { enterDetailsViewModel.longitude }
     val date by enterDetailsViewModel.dateString.collectAsState(initial = "Loading...")
     val time by enterDetailsViewModel.timeString.collectAsState(initial = "Loading...")
 
@@ -51,6 +54,8 @@ fun EnterDetails(
     val focusManager = LocalFocusManager.current
 
     val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -84,12 +89,11 @@ fun EnterDetails(
             }
         }
     ) {
-        if(isLoading) {
-            Box(Modifier.fillMaxWidth()) {
-                CircularProgressIndicator(Modifier.align(Alignment.Center))
+        if (isLoading) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-        }
-        else {
+        } else {
             Column(
                 Modifier
                     .fillMaxSize()
@@ -102,14 +106,12 @@ fun EnterDetails(
                     contentDescription = "Fish image",
                     modifier = Modifier
                         .padding(vertical = 12.dp)
-                        .width(256.dp)
-                        .height(256.dp)
-                        .fillMaxWidth()
-                        .clip(CircleShape),
+                        .size(256.dp)
+                        .clip(CircleShape)
+                        .border(4.dp, MaterialTheme.colorScheme.onSurface, CircleShape),
                     contentScale = ContentScale.Crop
                 )
 
-                Text("FISH: 98.38%", style = MaterialTheme.typography.titleLarge)
                 Text(date)
                 Text(time)
 
@@ -132,7 +134,12 @@ fun EnterDetails(
                         .padding(20.dp)
                 )
 
-                MapView(latitude, longitude)
+                MapView(
+                    latitude, longitude,
+                    Modifier
+                        .size(256.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
 
                 Button(
                     modifier = Modifier
@@ -141,6 +148,11 @@ fun EnterDetails(
                     onClick = {
                         if (quantity == "0" || quantity == "") {
                             quantityError = true
+                            Toast.makeText(
+                                context,
+                                "Please enter a valid quantity",
+                                Toast.LENGTH_LONG
+                            ).show()
                         } else {
                             coroutineScope.launch {
                                 enterDetailsViewModel.insertData(fishImageUri)

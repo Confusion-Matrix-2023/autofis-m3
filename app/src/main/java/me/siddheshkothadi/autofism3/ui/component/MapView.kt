@@ -14,20 +14,19 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun MapView(latitude: String, longitude: String) {
-    if(latitude.isBlank() or longitude.isBlank()) {
+fun MapView(
+    latitude: String, longitude: String, modifier: Modifier = Modifier
+) {
+    if (latitude.isBlank() or longitude.isBlank()) {
         CircularProgressIndicator()
-    }
-    else {
+    } else {
         val location = LatLng(latitude.toDouble(), longitude.toDouble())
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(location, 10f)
         }
         GoogleMap(
-            modifier = Modifier
-                .size(256.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            cameraPositionState = cameraPositionState
+            modifier = modifier,
+            cameraPositionState = cameraPositionState,
         ) {
             Marker(position = location)
         }
