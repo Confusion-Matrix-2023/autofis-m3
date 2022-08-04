@@ -113,9 +113,10 @@ class UploadWorker @AssistedInject constructor(
                 requestTimestamp
             )
         } catch (exception: Exception) {
+            Timber.e("Here lol")
             Timber.e(exception.toString())
             Result.retry()
-            return
+            throw exception
         }
     }
 }

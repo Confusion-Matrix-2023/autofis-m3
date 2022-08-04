@@ -23,6 +23,7 @@ import me.siddheshkothadi.autofism3.workmanager.UploadWorker
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ExperimentalPermissionsApi
@@ -46,10 +47,12 @@ class EnterDetailsViewModel @Inject constructor(
 
     private val _timestamp = MutableStateFlow<String>("")
     private val timestamp: StateFlow<String> = _timestamp
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val dateString = _timestamp.mapLatest { timeStampString ->
         getDate(timeStampString)
     }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val timeString = _timestamp.mapLatest { timeStampString ->
         getTime(timeStampString)
@@ -66,9 +69,16 @@ class EnterDetailsViewModel @Inject constructor(
                     )
                     .build()
             )
-            .setInputData(workDataOf(
-                "IMAGE_URI" to uri
-            ))
+            .setInputData(
+                workDataOf(
+                    "IMAGE_URI" to uri
+                )
+            )
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
             .build()
         workManager.enqueue(uploadRequest)
     }
@@ -100,13 +110,13 @@ class EnterDetailsViewModel @Inject constructor(
     }
 
     private fun getDate(timeStampString: String): String {
-        if(timeStampString.isBlank()) return "Loading..."
+        if (timeStampString.isBlank()) return "Loading..."
         val simpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
         return simpleDateFormat.format(timeStampString.toLong())
     }
 
     private fun getTime(timeStampString: String): String {
-        if(timeStampString.isBlank()) return "Loading..."
+        if (timeStampString.isBlank()) return "Loading..."
         val simpleDateFormat = SimpleDateFormat("HH:mm aa", Locale.ENGLISH)
         return simpleDateFormat.format(timeStampString.toLong())
     }
