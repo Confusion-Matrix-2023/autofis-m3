@@ -19,6 +19,7 @@ interface FishRepository {
     suspend fun deleteAllFish()
 
     suspend fun uploadFishData(
+        bearerToken: String,
         image: MultipartBody.Part,
         longitude: RequestBody,
         latitude: RequestBody,
@@ -26,5 +27,5 @@ interface FishRepository {
         timestamp: RequestBody,
     )
 
-    suspend fun getHistory() : List<Fish>
+    suspend fun getHistory(bearerToken: String) : List<Fish>
 }

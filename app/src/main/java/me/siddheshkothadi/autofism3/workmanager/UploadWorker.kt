@@ -13,8 +13,10 @@ import androidx.work.WorkerParameters
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.model.Fish
+import me.siddheshkothadi.autofism3.repository.DataStoreRepository
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -30,6 +32,7 @@ class UploadWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val workerParameters: WorkerParameters,
     private val fishRepository: FishRepository,
+    private val dataStoreRepository: DataStoreRepository
 ) : CoroutineWorker(context, workerParameters) {
 
     private lateinit var bitmap: Bitmap
@@ -102,7 +105,11 @@ class UploadWorker @AssistedInject constructor(
             val requestQuantity = fish.quantity.toRequestBody()
             val requestTimestamp = fish.timeStamp.toRequestBody()
 
+            val bearerToken = dataStoreRepository.bearerToken.first()
+            Timber.i(bearerToken)
+
             fishRepository.uploadFishData(
+                bearerToken,
                 requestImage,
                 requestLongitude,
                 requestLatitude,

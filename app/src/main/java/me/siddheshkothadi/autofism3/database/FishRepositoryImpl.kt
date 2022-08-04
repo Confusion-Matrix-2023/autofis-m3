@@ -44,16 +44,17 @@ class FishRepositoryImpl(
     }
 
     override suspend fun uploadFishData(
+        bearerToken: String,
         image: MultipartBody.Part,
         longitude: RequestBody,
         latitude: RequestBody,
         quantity: RequestBody,
         timestamp: RequestBody
     ) {
-        fileAPI.uploadData(image, longitude, latitude, quantity, timestamp)
+        fileAPI.uploadData(bearerToken, image, longitude, latitude, quantity, timestamp)
     }
 
-    override suspend fun getHistory(): List<Fish> {
-        return fileAPI.getHistory()
+    override suspend fun getHistory(bearerToken: String): List<Fish> {
+        return fileAPI.getHistory(bearerToken)
     }
 }

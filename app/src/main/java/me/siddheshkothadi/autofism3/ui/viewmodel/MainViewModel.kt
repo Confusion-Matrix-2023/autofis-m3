@@ -1,6 +1,5 @@
 package me.siddheshkothadi.autofism3.ui.viewmodel
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi

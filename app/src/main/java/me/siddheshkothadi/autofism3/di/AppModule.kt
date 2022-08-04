@@ -19,9 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import javax.inject.Singleton
 
-//const val BASE_URL = "https://file-upload-server.siddheshkothadi.repl.co/"
+const val BASE_URL = "https://file-upload-server.siddheshkothadi.repl.co/"
 //const val BASE_URL = "https://autofis-server.siddheshkothadi.repl.co/"
-const val BASE_URL = "http://127.0.0.1:5000/"
+//const val BASE_URL = "http://127.0.0.1:5000/"
 
 @Module
 @InstallIn(SingletonComponent::class)
