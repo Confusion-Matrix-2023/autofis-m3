@@ -57,8 +57,6 @@ fun History(
                                             .clip(RoundedCornerShape(12.dp))
                                     )
                                     Spacer(modifier = Modifier.height(12.dp))
-                                    Text("Gold Fish", style = MaterialTheme.typography.titleMedium)
-                                    Spacer(modifier = Modifier.height(4.dp))
                                     Text("16 July 2022", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text("9:38 AM", style = MaterialTheme.typography.labelSmall)

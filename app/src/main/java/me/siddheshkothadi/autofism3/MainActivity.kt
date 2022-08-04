@@ -114,7 +114,9 @@ class MainActivity : ComponentActivity() {
                                             // re-selecting the same item
                                             launchSingleTop = true
                                             // Restore state when re-selecting a previously selected item
-                                            restoreState = true
+                                            if(screen.route != Screen.Capture.route) {
+                                                restoreState = true
+                                            }
                                         }
                                     }
                                 )

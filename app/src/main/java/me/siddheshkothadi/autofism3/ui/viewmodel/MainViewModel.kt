@@ -33,7 +33,6 @@ class MainViewModel @Inject constructor(
                 _deviceId.value = dataStoreDeviceId
             }
             Timber.i("Device ID: ${deviceId.value}")
-            Toast.makeText(context, "Device ID: ${deviceId.value}", Toast.LENGTH_LONG).show()
         }
     }
 }

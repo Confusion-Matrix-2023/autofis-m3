@@ -3,7 +3,10 @@ package me.siddheshkothadi.autofism3.ui.screen
 import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,21 +15,43 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.launch
+import me.siddheshkothadi.autofism3.ui.component.MapView
 import me.siddheshkothadi.autofism3.ui.nav.Screen
+import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun EnterDetails(
     navController: NavHostController,
+    enterDetailsViewModel: EnterDetailsViewModel,
     fishImageUri: String
 ) {
-    var quantity by remember { mutableStateOf("") }
+    val isLoading by remember { enterDetailsViewModel.isLoading }
+    val quantity by remember { enterDetailsViewModel.quantity }
+    val latitude by remember {  enterDetailsViewModel.latitude }
+    val longitude by remember {  enterDetailsViewModel.longitude }
+    val date by enterDetailsViewModel.dateString.collectAsState(initial = "Loading...")
+    val time by enterDetailsViewModel.timeString.collectAsState(initial = "Loading...")
+
+    var quantityError by remember { mutableStateOf(false) }
+
+    val focusManager = LocalFocusManager.current
+
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             Surface(
@@ -59,40 +84,85 @@ fun EnterDetails(
             }
         }
     ) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AsyncImage(
-                model = Uri.parse(fishImageUri),
-                contentDescription = "Fish image",
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .width(250.dp)
-                    .height(250.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10)),
-                contentScale = ContentScale.Crop
-            )
+        if(isLoading) {
+            Box(Modifier.fillMaxWidth()) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }
+        else {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AsyncImage(
+                    model = Uri.parse(fishImageUri),
+                    contentDescription = "Fish image",
+                    modifier = Modifier
+                        .padding(vertical = 12.dp)
+                        .width(256.dp)
+                        .height(256.dp)
+                        .fillMaxWidth()
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
 
-            Text("XYZ Fish", style = MaterialTheme.typography.titleLarge)
-            Text("Today, 22 Aug 2022")
-            Text("09:32 AM")
+                Text("FISH: 98.38%", style = MaterialTheme.typography.titleLarge)
+                Text(date)
+                Text(time)
 
-            OutlinedTextField(
-                value = quantity,
-                onValueChange = {
-                    quantity = it
-                },
-                label = { Text("Quantity") },
-                modifier = Modifier.fillMaxWidth().padding(20.dp)
-            )
+                OutlinedTextField(
+                    value = quantity,
+                    onValueChange = {
+                        enterDetailsViewModel.setQuantity(it)
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    label = {
+                        Text("Quantity (in kg)", color = Color.Gray)
+                    },
+                    isError = quantityError,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                )
 
-            Button(onClick = {}) {
-                Text("Upload")
+                MapView(latitude, longitude)
+
+                Button(
+                    modifier = Modifier
+                        .width(300.dp)
+                        .padding(vertical = 24.dp),
+                    onClick = {
+                        if (quantity == "0" || quantity == "") {
+                            quantityError = true
+                        } else {
+                            coroutineScope.launch {
+                                enterDetailsViewModel.insertData(fishImageUri)
+                                enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
+                                navController.navigate(Screen.History.route) {
+                                    // Pop up to the start destination of the graph to
+                                    // avoid building up a large stack of destinations
+                                    // on the back stack as users select items
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    // Avoid multiple copies of the same destination when
+                                    // re-selecting the same item
+                                    launchSingleTop = true
+                                    // Restore state when re-selecting a previously selected item
+                                    restoreState = true
+                                }
+                            }
+                        }
+                    }) {
+                    Text("Submit")
+                }
             }
         }
     }
