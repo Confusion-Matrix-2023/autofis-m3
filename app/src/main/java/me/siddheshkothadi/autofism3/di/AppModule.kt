@@ -8,15 +8,15 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.siddheshkothadi.autofism3.FishApplication
-import me.siddheshkothadi.autofism3.database.DataStoreRepositoryImpl
-import me.siddheshkothadi.autofism3.database.FishDatabase
-import me.siddheshkothadi.autofism3.database.FishRepositoryImpl
+import me.siddheshkothadi.autofism3.datastore.LocalDataStoreImpl
+import me.siddheshkothadi.autofism3.database.PendingUploadFishDatabase
+import me.siddheshkothadi.autofism3.database.UploadHistoryFishDatabase
+import me.siddheshkothadi.autofism3.repository.FishRepositoryImpl
 import me.siddheshkothadi.autofism3.network.FileAPI
-import me.siddheshkothadi.autofism3.repository.DataStoreRepository
+import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 const val BASE_URL = "https://file-upload-server.siddheshkothadi.repl.co/"
@@ -46,23 +46,45 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideFishDatabase(appContext: FishApplication): FishDatabase {
+    fun providePendingUploadFishDatabase(appContext: FishApplication): PendingUploadFishDatabase {
         return Room.databaseBuilder(
             appContext,
-            FishDatabase::class.java,
-            "fish_database"
+            PendingUploadFishDatabase::class.java,
+            "pending_upload_fish_database"
         ).build()
     }
 
     @Singleton
     @Provides
-    fun provideFishRepository(fishDatabase: FishDatabase, fileAPI: FileAPI): FishRepository {
-        return FishRepositoryImpl(fishDatabase.fishDAO(), fileAPI)
+    fun provideUploadHistoryFishDatabase(appContext: FishApplication): UploadHistoryFishDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            UploadHistoryFishDatabase::class.java,
+            "upload_history_fish_database"
+        ).build()
     }
 
     @Singleton
     @Provides
-    fun provideDataStoreRepository(appContext: FishApplication): DataStoreRepository {
-        return DataStoreRepositoryImpl(appContext)
+    fun provideLocalDataStore(appContext: FishApplication): LocalDataStore {
+        return LocalDataStoreImpl(appContext)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFishRepository(
+        pendingUploadFishDatabase: PendingUploadFishDatabase,
+        uploadHistoryFishDatabase: UploadHistoryFishDatabase,
+        localDataStore: LocalDataStore,
+        fileAPI: FileAPI,
+        context: FishApplication
+    ): FishRepository {
+        return FishRepositoryImpl(
+            pendingUploadFishDatabase.fishDAO(),
+            uploadHistoryFishDatabase.fishDAO(),
+            localDataStore,
+            fileAPI,
+            context
+        )
     }
 }

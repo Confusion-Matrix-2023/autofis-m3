@@ -1,12 +1,11 @@
-package me.siddheshkothadi.autofism3.repository
+package me.siddheshkothadi.autofism3.datastore
 
 import androidx.datastore.preferences.core.Preferences
 import kotlinx.coroutines.flow.Flow
 
-interface DataStoreRepository {
-    val deviceData: Flow<Preferences>
+interface LocalDataStore {
     val deviceId: Flow<String>
     val bearerToken: Flow<String>
 
-    suspend fun setDeviceId(): String
+    suspend fun setLocalData(): LocalData
 }

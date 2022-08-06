@@ -1,7 +1,10 @@
+package me.siddheshkothadi.autofism3.network
+
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okio.BufferedSink
+import timber.log.Timber
 import java.io.InputStream
 
 class UploadStreamRequestBody(
@@ -16,6 +19,7 @@ class UploadStreamRequestBody(
 
     override fun writeTo(sink: BufferedSink) {
         val contentLength = inputStream.available().toFloat()
+        Timber.i(contentLength.toString())
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE) // DEFAULT_BUFFER_SIZE constant from kotlin.io.ConstantsKt
         inputStream.use { inputStream ->
             var uploaded = 0

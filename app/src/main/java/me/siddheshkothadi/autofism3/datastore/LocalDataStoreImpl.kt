@@ -1,4 +1,4 @@
-package me.siddheshkothadi.autofism3.database
+package me.siddheshkothadi.autofism3.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -11,29 +11,26 @@ import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.siddheshkothadi.autofism3.FishApplication
-import me.siddheshkothadi.autofism3.repository.DataStoreRepository
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-
-class DataStoreRepositoryImpl @Inject constructor(
+class LocalDataStoreImpl @Inject constructor(
     context: FishApplication
-) : DataStoreRepository
+) : LocalDataStore
 {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "device_data")
     private val deviceDataStore = context.dataStore
-
-    override val deviceData: Flow<Preferences>
+    private val deviceData: Flow<Preferences>
         get() = deviceDataStore.data
 
     override val deviceId: Flow<String>
-        get() = deviceDataStore.data.map { preferences ->
+        get() = deviceData.map { preferences ->
             preferences[DEVICE_ID_KEY] ?: ""
         }
 
     override val bearerToken: Flow<String>
-        get() = deviceDataStore.data.map { preferences ->
+        get() = deviceData.map { preferences ->
             preferences[BEARER_TOKEN_KEY] ?: ""
         }
 
@@ -48,10 +45,10 @@ class DataStoreRepositoryImpl @Inject constructor(
 
     private fun generateDeviceId(): String {
         val randomString = getRandomString()
-        val timeStamp = System.currentTimeMillis()
+        val timestamp = System.currentTimeMillis()
         val uniqueID = UUID.randomUUID().toString()
 
-        return "$randomString-$timeStamp-$uniqueID"
+        return "$randomString-$timestamp-$uniqueID"
     }
 
     private fun generateJWT(generatedDeviceId: String): String {
@@ -73,12 +70,13 @@ class DataStoreRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setDeviceId(): String {
+    override suspend fun setLocalData(): LocalData {
         val generatedDeviceId = generateDeviceId()
-        setDeviceId(generatedDeviceId)
         val jwt = generateJWT(generatedDeviceId)
-        setBearerToken("Bearer $jwt")
-        return generatedDeviceId
+        val generatedBearerToken = "Bearer $jwt"
+        setDeviceId(generatedDeviceId)
+        setBearerToken(generatedBearerToken)
+        return LocalData(generatedDeviceId, generatedBearerToken)
     }
 
     companion object {

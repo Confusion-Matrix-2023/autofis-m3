@@ -4,7 +4,6 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -29,15 +29,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import me.siddheshkothadi.autofism3.ui.nav.Screen
 import me.siddheshkothadi.autofism3.ui.nav.captureGraph
 import me.siddheshkothadi.autofism3.ui.screen.EmptyScreen
+import me.siddheshkothadi.autofism3.ui.screen.EnterDetails
 import me.siddheshkothadi.autofism3.ui.screen.History
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
-import me.siddheshkothadi.autofism3.ui.viewmodel.MainViewModel
+import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
+import me.siddheshkothadi.autofism3.ui.viewmodel.HistoryViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @OptIn(ExperimentalPermissionsApi::class)
-    private val mainViewModel: MainViewModel by viewModels()
 
     @OptIn(
         ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
@@ -45,11 +44,7 @@ class MainActivity : ComponentActivity() {
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        installSplashScreen().apply {
-            setKeepOnScreenCondition {
-                mainViewModel.deviceId.value.isNullOrBlank()
-            }
-        }
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -131,7 +126,8 @@ class MainActivity : ComponentActivity() {
                     ) {
                         captureGraph(navController)
                         composable(Screen.History.route) {
-                            History()
+                            val historyViewModel: HistoryViewModel = hiltViewModel()
+                            History(historyViewModel)
                         }
                         composable(Screen.Learn.route) {
                             EmptyScreen()

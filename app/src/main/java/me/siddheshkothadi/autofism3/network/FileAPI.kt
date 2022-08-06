@@ -1,7 +1,6 @@
 package me.siddheshkothadi.autofism3.network
 
-import kotlinx.coroutines.flow.Flow
-import me.siddheshkothadi.autofism3.model.Fish
+import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -22,5 +21,5 @@ interface FileAPI {
     @GET("/api/history")
     suspend fun getHistory(
         @Header("Authorization") bearerToken: String
-    ) : List<Fish>
+    ) : List<UploadHistoryFish>
 }

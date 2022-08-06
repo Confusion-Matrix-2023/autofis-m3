@@ -1,31 +1,21 @@
 package me.siddheshkothadi.autofism3.repository
 
+import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
-import me.siddheshkothadi.autofism3.model.Fish
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import me.siddheshkothadi.autofism3.model.PendingUploadFish
+import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 
 interface FishRepository {
-    fun getAllFish(): Flow<List<Fish>>
-
-    suspend fun getFishList(): List<Fish>
-
-    suspend fun getFishByImageUri(imageUri: String): Fish
-
-    suspend fun insertFish(fish: Fish)
-
-    suspend fun deleteFish(fish: Fish)
-
-    suspend fun deleteAllFish()
+    fun getPendingUploads(): Flow<List<PendingUploadFish>>
+    suspend fun getPendingUploadByImageUri(imageUri: String): PendingUploadFish
+    suspend fun insertFish(fish: PendingUploadFish)
+    suspend fun deleteFish(fish: PendingUploadFish)
 
     suspend fun uploadFishData(
-        bearerToken: String,
-        image: MultipartBody.Part,
-        longitude: RequestBody,
-        latitude: RequestBody,
-        quantity: RequestBody,
-        timestamp: RequestBody,
+        imageUri: String,
+        showNotification: (id: Int, bitmap: Bitmap, progress: Int) -> Unit
     )
 
-    suspend fun getHistory(bearerToken: String) : List<Fish>
+    suspend fun fetchUploadHistory()
+    fun getUploadHistory() : Flow<List<UploadHistoryFish>>
 }

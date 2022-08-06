@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import me.siddheshkothadi.autofism3.FishApplication
-import me.siddheshkothadi.autofism3.model.Fish
+import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.repository.FishRepository
+import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.workmanager.UploadWorker
 import timber.log.Timber
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -49,13 +49,13 @@ class EnterDetailsViewModel @Inject constructor(
     private val timestamp: StateFlow<String> = _timestamp
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val dateString = _timestamp.mapLatest { timeStampString ->
-        getDate(timeStampString)
+    val dateString = _timestamp.mapLatest { timestampString ->
+        DateUtils.getDate(timestampString)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val timeString = _timestamp.mapLatest { timeStampString ->
-        getTime(timeStampString)
+    val timeString = _timestamp.mapLatest { timestampString ->
+        DateUtils.getTime(timestampString)
     }
 
     private val workManager = WorkManager.getInstance(app)
@@ -109,25 +109,13 @@ class EnterDetailsViewModel @Inject constructor(
         _quantity.value = q
     }
 
-    private fun getDate(timeStampString: String): String {
-        if (timeStampString.isBlank()) return "Loading..."
-        val simpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
-        return simpleDateFormat.format(timeStampString.toLong())
-    }
-
-    private fun getTime(timeStampString: String): String {
-        if (timeStampString.isBlank()) return "Loading..."
-        val simpleDateFormat = SimpleDateFormat("HH:mm aa", Locale.ENGLISH)
-        return simpleDateFormat.format(timeStampString.toLong())
-    }
-
     suspend fun insertData(imageUri: String) {
-        val fish = Fish(
+        val fish = PendingUploadFish(
             imageUri = imageUri,
             longitude = longitude.value,
             latitude = latitude.value,
             quantity = quantity.value,
-            timeStamp = timestamp.value,
+            timestamp = timestamp.value,
         )
 
         Timber.i(fish.toString())

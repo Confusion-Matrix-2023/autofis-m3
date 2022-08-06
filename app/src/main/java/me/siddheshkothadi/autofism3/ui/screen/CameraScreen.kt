@@ -30,12 +30,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.CustomImageAnalyzer
+import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.utils.getBitmap
 import me.siddheshkothadi.autofism3.utils.getUri
 import me.siddheshkothadi.autofism3.utils.storeBitmap
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
+import kotlin.random.Random
 
 @Composable
 fun CameraScreen(
@@ -50,7 +52,7 @@ fun CameraScreen(
     var camera by remember { mutableStateOf<Camera?>(null) }
     var isFlashOn by remember { mutableStateOf(false) }
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
-    var imageUri : Uri? by remember { mutableStateOf(null) }
+    var imageUri: String by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
     var h by remember { mutableStateOf(0f) }
@@ -218,32 +220,48 @@ fun CameraScreen(
                     .size(64.dp)
                     .align(Alignment.BottomCenter),
                 onClick = {
+                    Timber.i("Clicked at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                     coroutineScope.launch {
-                        withContext(Dispatchers.IO) {
-                            isLoading = true
-                            imageCapture?.takePicture(
-                                ContextCompat.getMainExecutor(context),
-                                object : ImageCapture.OnImageCapturedCallback() {
-                                    @ExperimentalGetImage
-                                    override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                                        Timber.i("Clicked")
-                                        isLoading = true
-                                        val bitmap = imageProxy.getBitmap()
-                                        val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}.jpg")
-                                        imageFile.storeBitmap(context, bitmap)
-                                        val fishImageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
-                                        isLoading = false
-                                        navController.navigate("enter-details/$fishImageUri")
-                                        imageProxy.close()
-                                    }
+                        isLoading = true
+                        imageCapture?.takePicture(
+                            ContextCompat.getMainExecutor(context),
+                            object : ImageCapture.OnImageCapturedCallback() {
+                                @ExperimentalGetImage
+                                override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                                    coroutineScope.launch {
+                                        withContext(Dispatchers.IO) {
+                                            Timber.i(
+                                                "Received ImageProxy at ${
+                                                    DateUtils.getTimeSec(
+                                                        System.currentTimeMillis()
+                                                    )
+                                                }"
+                                            )
+                                            isLoading = true
 
-                                    override fun onError(exception: ImageCaptureException) {
-                                        Timber.tag("Image Capture").e(exception.toString())
-                                        isLoading = false
+                                            // TODO: Below line consumes time (>1sec)
+                                            val bitmap = imageProxy.getBitmap()
+
+                                            imageProxy.close()
+                                            val randomInt = Random.nextInt()
+                                            val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg")
+                                            imageFile.storeBitmap(context, bitmap)
+                                            imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
+                                            Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
+                                            isLoading = false
+                                        }
+                                        if(imageUri.isNotBlank()) {
+                                            navController.navigate("enter-details/$imageUri")
+                                        }
                                     }
                                 }
-                            )
-                        }
+
+                                override fun onError(exception: ImageCaptureException) {
+                                    Timber.tag("Image Capture").e(exception.toString())
+                                    isLoading = false
+                                }
+                            }
+                        )
                     }
                 },
                 enabled = !isLoading,
@@ -253,8 +271,11 @@ fun CameraScreen(
                 Icon(Icons.Filled.CameraAlt, "Camera")
             }
 
-            if(isLoading) {
-                CircularProgressIndicator(Modifier.align(Alignment.Center), color = androidx.compose.ui.graphics.Color(0xffffffff))
+            if (isLoading) {
+                CircularProgressIndicator(
+                    Modifier.align(Alignment.Center),
+                    color = androidx.compose.ui.graphics.Color(0xffffffff)
+                )
             }
         }
     }
