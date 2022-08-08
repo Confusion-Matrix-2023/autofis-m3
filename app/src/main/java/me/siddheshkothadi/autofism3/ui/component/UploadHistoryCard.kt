@@ -1,5 +1,7 @@
 package me.siddheshkothadi.autofism3.ui.component
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
@@ -21,6 +24,7 @@ import me.siddheshkothadi.autofism3.utils.DateUtils
 fun UploadHistoryCard(
     fish: UploadHistoryFish
 ) {
+    val context = LocalContext.current
     ElevatedCard(
         Modifier
             .fillMaxWidth()
@@ -53,7 +57,12 @@ fun UploadHistoryCard(
                     Text(DateUtils.getTime(fish.timestamp), style = MaterialTheme.typography.bodySmall)
 //                    Text("${fish.quantity} kg", style = MaterialTheme.typography.bodySmall)
                 }
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
+                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                    mapIntent.setPackage("com.google.android.apps.maps")
+                    context.startActivity(mapIntent)
+                }) {
                     Icon(Icons.Filled.PinDrop, contentDescription = null)
                 }
             }
