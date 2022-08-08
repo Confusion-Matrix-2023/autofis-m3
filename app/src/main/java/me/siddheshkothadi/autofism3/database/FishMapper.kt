@@ -9,7 +9,8 @@ fun PendingUploadFishEntity.toPendingUploadFish(): PendingUploadFish {
         longitude = longitude,
         latitude = latitude,
         quantity = quantity,
-        timestamp = timestamp
+        timestamp = timestamp,
+        workId = workId
     )
 }
 
@@ -19,7 +20,8 @@ fun PendingUploadFish.toPendingUploadFishEntity(): PendingUploadFishEntity {
         longitude = longitude,
         latitude = latitude,
         quantity = quantity,
-        timestamp = timestamp
+        timestamp = timestamp,
+        workId = workId
     )
 }
 

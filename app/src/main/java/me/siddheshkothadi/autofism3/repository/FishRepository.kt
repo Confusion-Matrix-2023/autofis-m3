@@ -6,6 +6,8 @@ import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 
 interface FishRepository {
+    suspend fun enqueueUpload(fish: PendingUploadFish)
+
     fun getPendingUploads(): Flow<List<PendingUploadFish>>
     suspend fun getPendingUploadByImageUri(imageUri: String): PendingUploadFish
     suspend fun insertFish(fish: PendingUploadFish)

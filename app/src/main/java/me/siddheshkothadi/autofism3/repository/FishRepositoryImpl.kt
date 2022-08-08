@@ -2,6 +2,8 @@ package me.siddheshkothadi.autofism3.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.work.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -12,10 +14,12 @@ import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 import me.siddheshkothadi.autofism3.network.FileAPI
 import me.siddheshkothadi.autofism3.network.UploadStreamRequestBody
+import me.siddheshkothadi.autofism3.workmanager.UploadWorker
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 
@@ -26,11 +30,46 @@ class FishRepositoryImpl(
     private val fileAPI: FileAPI,
     private val context: FishApplication
 ) : FishRepository {
+    private val workManager = WorkManager.getInstance(context)
+
+    @OptIn(ExperimentalPermissionsApi::class)
+    private fun generateWorkRequest(
+        uri: String,
+        tag: String
+    ): WorkRequest {
+        return OneTimeWorkRequestBuilder<UploadWorker>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(
+                        NetworkType.CONNECTED
+                    )
+                    .build()
+            )
+            .addTag(tag)
+            .setInputData(
+                workDataOf(
+                    IMAGE_URI to uri
+                )
+            )
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+    }
 
     private suspend fun getBearerToken(): String {
         val bearerToken = localDataStore.bearerToken.first()
         if (bearerToken.isNotBlank()) return bearerToken
         return localDataStore.setLocalData().bearerToken
+    }
+
+    override suspend fun enqueueUpload(fish: PendingUploadFish) {
+        val uploadRequest = generateWorkRequest(fish.imageUri, TAG)
+        val pendingUploadFish = fish.copy(workId = uploadRequest.id)
+        insertFish(pendingUploadFish)
+        workManager.enqueue(uploadRequest)
     }
 
     private fun deleteFishImage(imageUri: String) {
@@ -99,7 +138,7 @@ class FishRepositoryImpl(
             val requestLongitude = fish.longitude.toRequestBody()
             val requestLatitude = fish.latitude.toRequestBody()
             val requestQuantity = fish.quantity.toRequestBody()
-            val requesttimestamp = fish.timestamp.toRequestBody()
+            val requestTimestamp = fish.timestamp.toRequestBody()
 
             val bearerToken = getBearerToken()
 
@@ -109,7 +148,7 @@ class FishRepositoryImpl(
                 requestLongitude,
                 requestLatitude,
                 requestQuantity,
-                requesttimestamp
+                requestTimestamp
             )
 
             deleteFish(fish)
@@ -131,5 +170,10 @@ class FishRepositoryImpl(
         } catch (exception: Exception) {
             Timber.e(exception)
         }
+    }
+
+    companion object {
+        const val IMAGE_URI = "IMAGE_URI"
+        const val TAG = "UPLOAD_REQUEST"
     }
 }

@@ -155,7 +155,6 @@ fun EnterDetails(
                             ).show()
                         } else {
                             coroutineScope.launch {
-                                enterDetailsViewModel.insertData(fishImageUri)
                                 enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
                                 navController.navigate(Screen.History.route) {
                                     // Pop up to the start destination of the graph to

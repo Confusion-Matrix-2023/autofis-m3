@@ -34,8 +34,8 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 fishRepository.fetchUploadHistory()
-                _isFetching.value = false
             }
         }
+        _isFetching.value = false
     }
 }

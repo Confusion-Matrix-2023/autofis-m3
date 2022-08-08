@@ -249,9 +249,12 @@ fun CameraScreen(
                                             imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
                                             Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                                             isLoading = false
-                                        }
-                                        if(imageUri.isNotBlank()) {
-                                            navController.navigate("enter-details/$imageUri")
+
+                                            launch(Dispatchers.Main) {
+                                                if(imageUri.isNotBlank()) {
+                                                    navController.navigate("enter-details/$imageUri")
+                                                }
+                                            }
                                         }
                                     }
                                 }

@@ -3,16 +3,17 @@ package me.siddheshkothadi.autofism3.ui.component
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import coil.compose.AsyncImage
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.utils.DateUtils
@@ -22,6 +23,11 @@ import me.siddheshkothadi.autofism3.utils.DateUtils
 fun PendingUploadCard(
     fish: PendingUploadFish
 ) {
+    val context = LocalContext.current
+    val workManager = WorkManager.getInstance(context)
+
+    val workState = workManager.getWorkInfoByIdLiveData(fish.workId).observeAsState()
+
     ElevatedCard(
         Modifier
             .clip(RoundedCornerShape(12.dp))
@@ -52,6 +58,10 @@ fun PendingUploadCard(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
             )
+
+            if(workState.value?.state == WorkInfo.State.RUNNING) {
+                LinearProgressIndicator(Modifier.width(128.dp).padding(horizontal = 4.dp, vertical = 2.dp))
+            }
 //            Text(
 //                text = "${fish.quantity} kg",
 //                style = MaterialTheme.typography.bodySmall,

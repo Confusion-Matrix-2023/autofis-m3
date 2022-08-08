@@ -54,9 +54,9 @@ class MainActivity : ComponentActivity() {
                 val screens = listOf(
                     Screen.Capture,
                     Screen.History,
-                    Screen.Learn,
-                    Screen.Stats,
-                    Screen.Settings
+//                    Screen.Learn,
+//                    Screen.Stats,
+//                    Screen.Settings
                 )
 
                 val permissionsState = rememberMultiplePermissionsState(

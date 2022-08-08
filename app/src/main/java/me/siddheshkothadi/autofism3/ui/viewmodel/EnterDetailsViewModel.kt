@@ -11,11 +11,13 @@ import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishApplication
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.repository.FishRepository
@@ -58,31 +60,6 @@ class EnterDetailsViewModel @Inject constructor(
         DateUtils.getTime(timestampString)
     }
 
-    private val workManager = WorkManager.getInstance(app)
-
-    fun enqueueDataUploadRequest(uri: String) {
-        val uploadRequest = OneTimeWorkRequestBuilder<UploadWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(
-                        NetworkType.CONNECTED
-                    )
-                    .build()
-            )
-            .setInputData(
-                workDataOf(
-                    "IMAGE_URI" to uri
-                )
-            )
-            .setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
-                TimeUnit.MILLISECONDS
-            )
-            .build()
-        workManager.enqueue(uploadRequest)
-    }
-
     init {
         _isLoading.value = true
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
@@ -109,17 +86,19 @@ class EnterDetailsViewModel @Inject constructor(
         _quantity.value = q
     }
 
-    suspend fun insertData(imageUri: String) {
-        val fish = PendingUploadFish(
-            imageUri = imageUri,
-            longitude = longitude.value,
-            latitude = latitude.value,
-            quantity = quantity.value,
-            timestamp = timestamp.value,
-        )
+    fun enqueueDataUploadRequest(imageUri: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val fish = PendingUploadFish(
+                    imageUri = imageUri,
+                    timestamp = timestamp.value,
+                    longitude = longitude.value,
+                    latitude = latitude.value,
+                    quantity = quantity.value
+                )
 
-        Timber.i(fish.toString())
-
-        fishRepository.insertFish(fish)
+                fishRepository.enqueueUpload(fish)
+            }
+        }
     }
 }

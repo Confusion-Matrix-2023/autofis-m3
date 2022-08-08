@@ -7,6 +7,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -63,5 +64,6 @@ class UploadWorker @AssistedInject constructor(
         const val SUMMARY_ID = 0
         const val CHANNEL_ID = "upload_channel"
         const val IMAGE_URI = "IMAGE_URI"
+        const val PROGRESS = "Progress"
     }
 }
