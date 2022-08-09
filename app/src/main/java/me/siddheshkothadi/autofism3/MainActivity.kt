@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -34,6 +35,7 @@ import me.siddheshkothadi.autofism3.ui.screen.History
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
 import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
 import me.siddheshkothadi.autofism3.ui.viewmodel.HistoryViewModel
+import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -98,21 +100,37 @@ class MainActivity : ComponentActivity() {
                                     label = { Text(stringResource(id = screen.resourceId)) },
                                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                     onClick = {
+                                        Timber.tag("NavDebug").i(navController.backQueue.map {
+                                            it.destination.route
+                                        }.toString())
+
+                                        if(screen.route == Screen.Capture.route) {
+                                            navController.popBackStack(
+                                                route = Screen.Camera.route,
+                                                inclusive = false
+                                            )
+                                            Timber.tag("NavDebug").i(navController.backQueue.map {
+                                                it.destination.route
+                                            }.toString())
+                                            return@NavigationBarItem
+                                        }
+
                                         navController.navigate(screen.route) {
                                             // Pop up to the start destination of the graph to
                                             // avoid building up a large stack of destinations
                                             // on the back stack as users select items
-                                            popUpTo(navController.graph.findStartDestination().id) {
+                                            popUpTo(Screen.Camera.route) {
                                                 saveState = true
                                             }
                                             // Avoid multiple copies of the same destination when
                                             // re-selecting the same item
                                             launchSingleTop = true
                                             // Restore state when re-selecting a previously selected item
-                                            if(screen.route != Screen.Capture.route) {
-                                                restoreState = true
-                                            }
+                                            restoreState = screen.route != Screen.Capture.route
                                         }
+                                        Timber.tag("NavDebug").i(navController.backQueue.map {
+                                            it.destination.route
+                                        }.toString())
                                     }
                                 )
                             }
