@@ -38,7 +38,7 @@ fun History(
 
     val pendingUploads by historyViewModel.pendingUploads.collectAsState(initial = listOf())
     val uploadHistory by historyViewModel.uploadHistory.collectAsState(initial = listOf())
-    val isFetching = remember { historyViewModel.isFetching }
+    val isFetching by remember { historyViewModel.isFetching }
 
     Scaffold(
         topBar = {
@@ -87,7 +87,7 @@ fun History(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 2.dp, bottom = 8.dp),
+                        .padding(top = 8.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -96,7 +96,7 @@ fun History(
                         style = MaterialTheme.typography.titleLarge,
                     )
                     if (isFetching) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(Modifier.size(20.dp))
                     } else {
                         TextButton(onClick = { historyViewModel.fetchUploadHistory() }) {
                             Text("Fetch")

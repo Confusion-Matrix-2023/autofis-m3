@@ -1,6 +1,8 @@
 package me.siddheshkothadi.autofism3.datastore
 
 import android.content.Context
+import android.os.Build
+import android.provider.Settings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -11,14 +13,14 @@ import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.siddheshkothadi.autofism3.FishApplication
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 class LocalDataStoreImpl @Inject constructor(
-    context: FishApplication
-) : LocalDataStore
-{
+    private val context: FishApplication
+) : LocalDataStore {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "device_data")
     private val deviceDataStore = context.dataStore
     private val deviceData: Flow<Preferences>
@@ -43,13 +45,26 @@ class LocalDataStoreImpl @Inject constructor(
         return string
     }
 
+    private fun getDeviceName(): String {
+        val deviceName =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) Settings.Global.getString(
+                context.contentResolver,
+                Settings.Global.DEVICE_NAME
+            ) else Settings.Secure.getString(context.contentResolver, "bluetooth_name")
+
+        return deviceName.replace("\\s+".toRegex(), "")
+    }
+
     private fun generateDeviceId(): String {
+        val deviceName = getDeviceName()
         val randomString = getRandomString()
         val timestamp = System.currentTimeMillis()
         val uniqueID = UUID.randomUUID().toString()
 
-        return "$randomString-$timestamp-$uniqueID"
+        return "$deviceName-$randomString-$timestamp-$uniqueID"
     }
+
+    private fun getPersistentDeviceId(): String = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
 
     private fun generateJWT(generatedDeviceId: String): String {
         return Jwts.builder()
@@ -71,7 +86,7 @@ class LocalDataStoreImpl @Inject constructor(
     }
 
     override suspend fun setLocalData(): LocalData {
-        val generatedDeviceId = generateDeviceId()
+        val generatedDeviceId = getPersistentDeviceId()
         val jwt = generateJWT(generatedDeviceId)
         val generatedBearerToken = "Bearer $jwt"
         setDeviceId(generatedDeviceId)
