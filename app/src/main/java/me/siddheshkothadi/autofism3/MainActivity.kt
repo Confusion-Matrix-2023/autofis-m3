@@ -12,14 +12,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -30,10 +28,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import me.siddheshkothadi.autofism3.ui.nav.Screen
 import me.siddheshkothadi.autofism3.ui.nav.captureGraph
 import me.siddheshkothadi.autofism3.ui.screen.EmptyScreen
-import me.siddheshkothadi.autofism3.ui.screen.EnterDetails
 import me.siddheshkothadi.autofism3.ui.screen.History
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
-import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
 import me.siddheshkothadi.autofism3.ui.viewmodel.HistoryViewModel
 import timber.log.Timber
 
@@ -104,7 +100,7 @@ class MainActivity : ComponentActivity() {
                                             it.destination.route
                                         }.toString())
 
-                                        if(screen.route == Screen.Capture.route) {
+                                        if (screen.route == Screen.Capture.route) {
                                             navController.popBackStack(
                                                 route = Screen.Camera.route,
                                                 inclusive = false

@@ -13,6 +13,7 @@ import me.siddheshkothadi.autofism3.FishApplication
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 import me.siddheshkothadi.autofism3.repository.FishRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +22,7 @@ class HistoryViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _isFetching = mutableStateOf(false);
-    val isFetching = _isFetching.value
+    val isFetching = _isFetching
 
     val pendingUploads: Flow<List<PendingUploadFish>>
         get() = fishRepository.getPendingUploads()
@@ -29,13 +30,22 @@ class HistoryViewModel @Inject constructor(
     val uploadHistory: Flow<List<UploadHistoryFish>>
         get() = fishRepository.getUploadHistory()
 
+    init {
+        fetchUploadHistory()
+    }
+
     fun fetchUploadHistory() {
-        _isFetching.value = true
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                fishRepository.fetchUploadHistory()
+            try {
+                _isFetching.value = true
+                withContext(Dispatchers.IO) {
+                    fishRepository.fetchUploadHistory()
+                }
+            } catch (exception: Exception) {
+                Timber.e(exception)
+            } finally {
+                _isFetching.value = false
             }
         }
-        _isFetching.value = false
     }
 }
