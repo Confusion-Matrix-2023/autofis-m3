@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import androidx.camera.core.ImageProxy
 
+
 fun ImageProxy.getBitmap(): Bitmap {
     val buffer = planes[0].buffer
     buffer.rewind()
@@ -27,4 +28,10 @@ fun Bitmap.getQualityNumber(): Int {
         in 4000001..5000000 -> 50
         else -> 75
     }
+}
+
+private fun toBitmap(image: ImageProxy): Bitmap? {
+    val bitmapBuffer = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
+    bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
+    return bitmapBuffer
 }

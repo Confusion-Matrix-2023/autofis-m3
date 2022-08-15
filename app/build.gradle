@@ -124,4 +124,11 @@ dependencies {
 
     // JWT
     implementation 'io.jsonwebtoken:jjwt:0.7.0'
+
+    // tflite
+    implementation 'org.tensorflow:tensorflow-lite:2.4.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.4.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
 }
