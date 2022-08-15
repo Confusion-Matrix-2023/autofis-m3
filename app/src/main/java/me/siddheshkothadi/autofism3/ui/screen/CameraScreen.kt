@@ -229,32 +229,25 @@ fun CameraScreen(
                                 @ExperimentalGetImage
                                 override fun onCaptureSuccess(imageProxy: ImageProxy) {
                                     coroutineScope.launch {
-                                        withContext(Dispatchers.IO) {
-                                            Timber.i(
-                                                "Received ImageProxy at ${
-                                                    DateUtils.getTimeSec(
-                                                        System.currentTimeMillis()
-                                                    )
-                                                }"
-                                            )
+                                        try {
                                             isLoading = true
-
-                                            // TODO: Below line consumes time (>1sec)
-                                            val bitmap = imageProxy.getBitmap()
-
-                                            imageProxy.close()
-                                            val randomInt = Random.nextInt()
-                                            val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg")
-                                            imageFile.storeBitmap(context, bitmap)
-                                            imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
-                                            Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
-                                            isLoading = false
-
-                                            launch(Dispatchers.Main) {
-                                                if(imageUri.isNotBlank()) {
-                                                    navController.navigate("enter-details/$imageUri")
-                                                }
+                                            withContext(Dispatchers.IO) {
+                                                // TODO: Below line consumes time (>1sec)
+                                                val bitmap = imageProxy.getBitmap()
+                                                val randomInt = Random.nextInt()
+                                                val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg")
+                                                imageFile.storeBitmap(context, bitmap)
+                                                imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
+                                                Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                                             }
+                                        } catch(exception: Exception) {
+                                            Timber.e(exception)
+                                        } finally {
+                                            if(imageUri.isNotBlank()) {
+                                                navController.navigate("enter-details/$imageUri")
+                                            }
+                                            isLoading = false
+                                            imageProxy.close()
                                         }
                                     }
                                 }
