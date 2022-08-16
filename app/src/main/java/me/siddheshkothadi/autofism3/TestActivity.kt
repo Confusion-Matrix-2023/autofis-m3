@@ -1,6 +1,5 @@
 package me.siddheshkothadi.autofism3
 
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
@@ -17,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -28,6 +26,7 @@ import androidx.core.view.WindowCompat
 import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
 import timber.log.Timber
+import kotlin.math.min
 
 class TestActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +41,14 @@ class TestActivity : ComponentActivity() {
             var camera by remember { mutableStateOf<Camera?>(null) }
             var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
 
-            var bitmap: Bitmap? by remember {
-                mutableStateOf(null)
+//            var bitmap: Bitmap? by remember {
+//                mutableStateOf(null)
+//            }
+            var bitmapHeight: Int by remember {
+                mutableStateOf(0)
+            }
+            var bitmapWidth: Int by remember {
+                mutableStateOf(0)
             }
 
             var results: List<Classifier.Recognition> by remember {
@@ -90,8 +95,9 @@ class TestActivity : ComponentActivity() {
                                     .apply {
                                         setAnalyzer(
                                             executor,
-                                            FishAnalyzer(context, coroutineScope) { bmp, r ->
-                                                bitmap = bmp
+                                            FishAnalyzer(context, coroutineScope) { h, w, r ->
+                                                bitmapHeight = h
+                                                bitmapWidth = w
                                                 results = r
                                             }
                                         )
@@ -108,29 +114,37 @@ class TestActivity : ComponentActivity() {
                             }, executor)
                             previewView
                         },
-                        modifier = Modifier.aspectRatio(1f).fillMaxSize()
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .fillMaxSize()
                     )
-                    Canvas(modifier = Modifier.aspectRatio(1f).fillMaxSize()) {
-                        if (bitmap != null) {
-                            val scaleY = size.height * 1f / bitmap!!.width
-                            val scaleX = size.width * 1f / bitmap!!.height
-                            results.forEach {
-                                Timber.i(it.toString())
-                                drawContext.canvas.nativeCanvas.apply {
-                                    drawRect(
-                                        RectF(
-                                            it.location.left * scaleX,
-                                            it.location.top * scaleY,
-                                            it.location.right * scaleX,
-                                            it.location.bottom * scaleY
-                                        ),
-                                        Paint().apply {
-                                            color = Color.WHITE
-                                            strokeWidth = 8F
-                                            style = Paint.Style.STROKE
-                                        }
-                                    )
-                                }
+                    Canvas(
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .fillMaxSize()
+                    ) {
+                        val scaleY = size.height * 1f / bitmapWidth
+                        val scaleX = size.width * 1f / bitmapHeight
+                        results.forEach {
+                            Timber.i(it.toString())
+                            val cornerSize: Float =
+                                min(it.location.width(), it.location.height()) / 8.0f
+                            drawContext.canvas.nativeCanvas.apply {
+                                drawRoundRect(
+                                    RectF(
+                                        it.location.left * scaleX,
+                                        it.location.top * scaleY,
+                                        it.location.right * scaleX,
+                                        it.location.bottom * scaleY
+                                    ),
+                                    cornerSize,
+                                    cornerSize,
+                                    Paint().apply {
+                                        color = Color.WHITE
+                                        strokeWidth = 8F
+                                        style = Paint.Style.STROKE
+                                    }
+                                )
                             }
                         }
                     }

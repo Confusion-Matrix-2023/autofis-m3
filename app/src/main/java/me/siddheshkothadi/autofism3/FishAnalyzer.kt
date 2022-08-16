@@ -12,7 +12,6 @@ import androidx.camera.core.ImageProxy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.detection.env.ImageUtils
 import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import me.siddheshkothadi.autofism3.detection.tflite.DetectorFactory
@@ -22,7 +21,7 @@ import java.util.*
 class FishAnalyzer(
     private val context: Context,
     private val coroutineScope: CoroutineScope,
-    private val setResults: (Bitmap, MutableList<Classifier.Recognition>) -> Unit
+    private val setResults: (Int, Int, MutableList<Classifier.Recognition>) -> Unit
 ) :
     ImageAnalysis.Analyzer {
 
@@ -30,11 +29,11 @@ class FishAnalyzer(
 
     @androidx.camera.core.ExperimentalGetImage
     override fun analyze(imageProxy: ImageProxy) {
-        detector.useGpu()
+//        detector.useGpu()
         val image = imageProxy.image
 
         if (image != null) {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.IO) {
 //                480, 640
                 val previewHeight = image.height
                 val previewWidth = image.width
@@ -69,19 +68,19 @@ class FishAnalyzer(
                 // rgbBytes is 1d array that stores rgb values after converting yuv to rgb
                 val rgbBytes = IntArray(previewWidth * previewHeight)
 
-                withContext(Dispatchers.IO) {
-                    ImageUtils.convertYUV420ToARGB8888(
-                        yuvBytes[0],
-                        yuvBytes[1],
-                        yuvBytes[2],
-                        previewWidth,
-                        previewHeight,
-                        yRowStride,
-                        uvRowStride,
-                        uvPixelStride,
-                        rgbBytes
-                    )
-                }
+//                withContext(Dispatchers.IO) {
+                ImageUtils.convertYUV420ToARGB8888(
+                    yuvBytes[0],
+                    yuvBytes[1],
+                    yuvBytes[2],
+                    previewWidth,
+                    previewHeight,
+                    yRowStride,
+                    uvRowStride,
+                    uvPixelStride,
+                    rgbBytes
+                )
+//                }
 
                 // We set rgbBytes values in rgbFrameBitmap
                 val rgbFrameBitmap =
@@ -121,7 +120,7 @@ class FishAnalyzer(
                 }
 
                 Timber.i(mappedRecognitions.toString())
-                setResults(croppedBitmap, mappedRecognitions)
+                setResults(croppedBitmap.height, croppedBitmap.width, mappedRecognitions)
 
                 // ======================================================================
 
@@ -137,6 +136,8 @@ class FishAnalyzer(
                 imageProxy.close()
             }
 
+        } else {
+            imageProxy.close()
         }
     }
 
