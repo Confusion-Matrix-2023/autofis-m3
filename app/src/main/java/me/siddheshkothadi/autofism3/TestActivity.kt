@@ -141,7 +141,7 @@ class TestActivity : ComponentActivity() {
                                     cornerSize,
                                     Paint().apply {
                                         color = Color.WHITE
-                                        strokeWidth = 8F
+                                        strokeWidth = 10F
                                         style = Paint.Style.STROKE
                                     }
                                 )
