@@ -89,6 +89,7 @@ class LocalDataStoreImpl @Inject constructor(
         val generatedDeviceId = getPersistentDeviceId()
         val jwt = generateJWT(generatedDeviceId)
         val generatedBearerToken = "Bearer $jwt"
+        Timber.i(generatedBearerToken)
         setDeviceId(generatedDeviceId)
         setBearerToken(generatedBearerToken)
         return LocalData(generatedDeviceId, generatedBearerToken)

@@ -245,7 +245,9 @@ fun CameraScreen(
                                             imageProxy.close()
                                             val randomInt = Random.nextInt()
                                             val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg")
-                                            imageFile.storeBitmap(context, bitmap)
+                                            if(bitmap != null) {
+                                                imageFile.storeBitmap(context, bitmap)
+                                            }
                                             imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
                                             Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                                             isLoading = false

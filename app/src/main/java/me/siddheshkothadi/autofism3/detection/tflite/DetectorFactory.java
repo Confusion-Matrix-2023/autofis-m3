@@ -26,7 +26,7 @@ public class DetectorFactory {
                     10,13, 16,30, 33,23, 30,61, 62,45, 59,119, 116,90, 156,198, 373,326
             };
         }
-        else if (modelFilename.equals("yolov5s-fp16.tflite")) {
+        else if (modelFilename.equals("yolov5_lahattan_clggpu.tflite")) {
             labelFilename = "file:///android_asset/fish.txt";
             isQuantized = false;
             inputSize = 640;

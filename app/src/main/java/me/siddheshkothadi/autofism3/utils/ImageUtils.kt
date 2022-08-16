@@ -30,7 +30,7 @@ fun Bitmap.getQualityNumber(): Int {
     }
 }
 
-private fun toBitmap(image: ImageProxy): Bitmap? {
+fun toBitmap(image: ImageProxy): Bitmap? {
     val bitmapBuffer = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
     bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
     return bitmapBuffer
