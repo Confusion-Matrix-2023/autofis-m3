@@ -29,6 +29,11 @@ import timber.log.Timber
 import kotlin.math.min
 
 class TestActivity : ComponentActivity() {
+    private val paintConfig = Paint().apply {
+        color = Color.WHITE
+        strokeWidth = 10F
+        style = Paint.Style.STROKE
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         installSplashScreen()
@@ -139,11 +144,7 @@ class TestActivity : ComponentActivity() {
                                     ),
                                     cornerSize,
                                     cornerSize,
-                                    Paint().apply {
-                                        color = Color.WHITE
-                                        strokeWidth = 10F
-                                        style = Paint.Style.STROKE
-                                    }
+                                    paintConfig
                                 )
                             }
                         }
