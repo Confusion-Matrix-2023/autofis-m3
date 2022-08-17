@@ -3,7 +3,8 @@ package me.siddheshkothadi.autofism3.ui.screen
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
-import android.net.Uri
+import android.text.TextUtils
+import android.util.TypedValue
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -29,7 +30,8 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.siddheshkothadi.autofism3.CustomImageAnalyzer
+import me.siddheshkothadi.autofism3.FishAnalyzer
+import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.utils.getBitmap
 import me.siddheshkothadi.autofism3.utils.getUri
@@ -37,6 +39,7 @@ import me.siddheshkothadi.autofism3.utils.storeBitmap
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
+import kotlin.math.min
 import kotlin.random.Random
 
 @Composable
@@ -55,16 +58,55 @@ fun CameraScreen(
     var imageUri: String by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    var h by remember { mutableStateOf(0f) }
-    var w by remember { mutableStateOf(0f) }
+    var bitmapHeight: Int by remember {
+        mutableStateOf(0)
+    }
+    var bitmapWidth: Int by remember {
+        mutableStateOf(0)
+    }
 
-    var top by remember { mutableStateOf(0f) }
-    var bottom by remember { mutableStateOf(0f) }
-    var left by remember { mutableStateOf(0f) }
-    var right by remember { mutableStateOf(0f) }
+    var results: List<Classifier.Recognition> by remember {
+        mutableStateOf(listOf())
+    }
 
-    var detectedLabel by remember { mutableStateOf("") }
-    var accuracyText by remember { mutableStateOf("") }
+    val paintConfig = remember {
+        Paint().apply {
+            color = Color.BLUE
+            strokeWidth = 10.0f
+            style = Paint.Style.STROKE
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            strokeMiter = 100f
+        }
+    }
+
+    val textSizePx = remember {
+        TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            15f,
+            context.resources.displayMetrics
+        )
+    }
+
+    val interiorPaint = remember {
+        Paint().apply {
+            textSize = textSizePx
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            isAntiAlias = false
+            alpha = 255
+        }
+    }
+
+    val exteriorPaint = remember {
+        Paint().apply {
+            textSize = textSizePx
+            color = Color.BLUE
+            style = Paint.Style.FILL
+            isAntiAlias = false
+            alpha = 255
+        }
+    }
 
     Surface(
         modifier = Modifier
@@ -77,7 +119,10 @@ fun CameraScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         Box {
-            Box {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 AndroidView(
                     factory = { ctx ->
                         val previewView = PreviewView(ctx)
@@ -106,18 +151,12 @@ fun CameraScreen(
                                 .apply {
                                     setAnalyzer(
                                         executor,
-                                        CustomImageAnalyzer { rect, label, imageHeight, imageWidth ->
-                                            top = rect.top * 1f
-                                            bottom = rect.bottom * 1f
-                                            left = rect.left * 1f
-                                            right = rect.right * 1f
-
-                                            h = imageHeight * 1f
-                                            w = imageWidth * 1f
-
-                                            detectedLabel = label.text
-                                            accuracyText = label.confidence.toString()
-                                        })
+                                        FishAnalyzer(context, coroutineScope) { h, w, r ->
+                                            bitmapHeight = h
+                                            bitmapWidth = w
+                                            results = r
+                                        }
+                                    )
                                 }
 
                             cameraProvider.unbindAll()
@@ -131,45 +170,60 @@ fun CameraScreen(
                         }, executor)
                         previewView
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .fillMaxSize(),
                 )
-                Canvas(modifier = Modifier.fillMaxSize()) {
-                    val scaleY = size.height * 1f / w
-                    val scaleX = size.width * 1f / h
-                    drawContext.canvas.nativeCanvas.apply {
-                        drawRect(
-                            RectF(
-                                left * scaleX,
-                                top * scaleY,
-                                right * scaleX,
-                                bottom * scaleY
-                            ),
-                            Paint().apply {
-                                color = Color.WHITE
-                                strokeWidth = 8F
-                                style = Paint.Style.STROKE
-                            }
-                        )
-                        drawText(
-                            detectedLabel,
-                            left * scaleX + 256f,
-                            top * scaleY - 80f,
-                            Paint().apply {
-                                textSize = 48f
-                                color = Color.WHITE
-                                textAlign = Paint.Align.CENTER
-                            }
-                        )
-                        drawText(
-                            accuracyText,
-                            left * scaleX + 256f,
-                            top * scaleY - 20f,
-                            Paint().apply {
-                                textSize = 50f
-                                color = Color.WHITE
-                                textAlign = Paint.Align.CENTER
-                            }
-                        )
+                Canvas(
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .fillMaxSize()
+                ) {
+                    val scaleY = size.height * 1f / bitmapWidth
+                    val scaleX = size.width * 1f / bitmapHeight
+                    results.forEach {
+                        val cornerSize: Float =
+                            min(it.location.width(), it.location.height()) / 8.0f
+                        val width = exteriorPaint.measureText(it.title)
+                        val textSize = exteriorPaint.textSize
+                        val paint = Paint(paintConfig)
+                        paint.style = Paint.Style.FILL
+                        paint.alpha = 160
+                        val posX = it.location.left + cornerSize
+                        val posY = it.location.top
+
+                        val labelString = if (!TextUtils.isEmpty(it.title)) String.format(
+                            "%s %.2f", it.title,
+                            100 * it.confidence
+                        ) else String.format("%.2f", 100 * it.confidence)
+
+                        drawContext.canvas.nativeCanvas.apply {
+                            drawRoundRect(
+                                RectF(
+                                    it.location.left * scaleX,
+                                    it.location.top * scaleY,
+                                    it.location.right * scaleX,
+                                    it.location.bottom * scaleY
+                                ),
+                                cornerSize,
+                                cornerSize,
+                                paintConfig
+                            )
+                            drawRect(
+                                posX * scaleX,
+                                (posY + textSize.toInt()) * scaleY,
+                                (posX + width.toInt() * scaleX) * scaleX,
+                                posY * scaleY,
+                                paint
+                            )
+
+                            drawText(
+                                labelString,
+                                posX * scaleX,
+                                (posY + textSize.toInt() - 10) * scaleY,
+                                interiorPaint
+                            )
+                        }
                     }
                 }
             }
@@ -197,20 +251,18 @@ fun CameraScreen(
                 }) {
                     if (isFlashOn) Icon(
                         Icons.Filled.FlashOn,
-                        "", tint = androidx.compose.ui.graphics.Color.White
+                        ""
                     ) else Icon(
                         Icons.Filled.FlashOff,
                         "",
-                        tint = androidx.compose.ui.graphics.Color.White
                     )
                 }
                 Text(
                     "AutoFIS",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = androidx.compose.ui.graphics.Color.White
+                    style = MaterialTheme.typography.titleLarge
                 )
                 IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.MoreVert, "", tint = androidx.compose.ui.graphics.Color.White)
+                    Icon(Icons.Filled.MoreVert, "")
                 }
             }
 
@@ -244,16 +296,19 @@ fun CameraScreen(
 
                                             imageProxy.close()
                                             val randomInt = Random.nextInt()
-                                            val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg")
-                                            if(bitmap != null) {
-                                                imageFile.storeBitmap(context, bitmap)
-                                            }
-                                            imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
+                                            val imageFile = File(
+                                                context.filesDir,
+                                                "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg"
+                                            )
+                                            imageFile.storeBitmap(context, bitmap)
+                                            imageUri = URLEncoder.encode(
+                                                imageFile.getUri(context).toString(), "utf-8"
+                                            )
                                             Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                                             isLoading = false
 
                                             launch(Dispatchers.Main) {
-                                                if(imageUri.isNotBlank()) {
+                                                if (imageUri.isNotBlank()) {
                                                     navController.navigate("enter-details/$imageUri")
                                                 }
                                             }
@@ -269,7 +324,7 @@ fun CameraScreen(
                         )
                     }
                 },
-                enabled = !isLoading,
+                enabled = !(isLoading || results.isEmpty()),
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp)
             ) {

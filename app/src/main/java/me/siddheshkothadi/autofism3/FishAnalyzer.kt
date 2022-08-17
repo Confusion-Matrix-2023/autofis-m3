@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.media.Image.Plane
 import android.view.Surface
 import android.view.WindowManager
@@ -43,7 +44,7 @@ class FishAnalyzer(
                 val cropSize = detector.inputSize
                 val sensorOrientation = ROTATION - getScreenOrientation()
 
-                // Matrix to convert frame from 4_3 aspect ratio to cropped size
+                // Matrix to convert frame from 4_3 aspect ratio to cropped size and rotate
                 val frameToCropTransform = ImageUtils.getTransformationMatrix(
                     previewWidth,
                     previewHeight,
@@ -54,8 +55,16 @@ class FishAnalyzer(
                 )
 
                 // Inverse of that matrix will convert cropped image to the actual 4_3 frame
-                val cropToFrameTransform = Matrix()
-                frameToCropTransform.invert(cropToFrameTransform)
+//                val cropToFrameTransform = Matrix()
+//                frameToCropTransform.invert(cropToFrameTransform)
+//                val cropToFrameTransform = ImageUtils.getTransformationMatrix(
+//                    cropSize,
+//                    cropSize,
+//                    previewHeight,
+//                    previewWidth,
+//                    0,
+//                    true
+//                )
 
                 // yuv stores the og image info (4_3)
                 val yuvBytes = arrayOfNulls<ByteArray>(3)
@@ -109,12 +118,14 @@ class FishAnalyzer(
                 val mappedRecognitions: MutableList<Classifier.Recognition> =
                     LinkedList<Classifier.Recognition>()
 
+//                val c2 = Canvas();
+
                 for (result in results) {
                     val location = result.location
                     if (location != null && result.confidence >= minimumConfidence) {
 //                        c2.drawRect(location, Paint())
 //                        cropToFrameTransform.mapRect(location)
-                        result.location = location
+//                        result.location = location
                         mappedRecognitions.add(result)
                     }
                 }
@@ -164,8 +175,8 @@ class FishAnalyzer(
 
     companion object {
         const val INPUT_SIZE = 640
-        const val MODEL_FILE_PATH = "yolov5_lahattan_clggpu.tflite"
+        const val MODEL_FILE_PATH = "yolov5m_On5000.tflite"
         const val ROTATION = 90
-        const val MINIMUM_CONFIDENCE_TF_OD_API = 0.3f
+        const val MINIMUM_CONFIDENCE_TF_OD_API = 0.8f
     }
 }

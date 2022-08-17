@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.TypedValue
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.camera.core.*
@@ -27,17 +29,50 @@ import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
 import timber.log.Timber
 import kotlin.math.min
+import kotlin.properties.Delegates
 
 class TestActivity : ComponentActivity() {
+    private var textSizePx by Delegates.notNull<Float>();
+
     private val paintConfig = Paint().apply {
-        color = Color.WHITE
-        strokeWidth = 10F
+        color = Color.BLUE
+        strokeWidth = 10.0f
         style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+        strokeMiter = 100f
     }
+
+    private lateinit var interiorPaint: Paint
+    private lateinit var exteriorPaint: Paint
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        textSizePx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            15f,
+            this.resources.displayMetrics
+        )
+
+        interiorPaint = Paint().apply {
+            textSize = textSizePx
+            color = Color.WHITE
+            style = Paint.Style.FILL
+            isAntiAlias = false
+            alpha = 255
+        }
+
+        exteriorPaint = Paint().apply {
+            textSize = textSizePx
+            color = Color.BLUE
+            style = Paint.Style.FILL
+            isAntiAlias = false
+            alpha = 255
+        }
+
         setContent {
             val context = LocalContext.current
             val coroutineScope = rememberCoroutineScope()
@@ -79,7 +114,6 @@ class TestActivity : ComponentActivity() {
                             cameraProviderFuture.addListener({
                                 val cameraProvider = cameraProviderFuture.get()
                                 val preview = Preview.Builder()
-                                    .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                                     .build()
                                     .apply {
                                         setSurfaceProvider(previewView.surfaceProvider)
@@ -131,9 +165,21 @@ class TestActivity : ComponentActivity() {
                         val scaleY = size.height * 1f / bitmapWidth
                         val scaleX = size.width * 1f / bitmapHeight
                         results.forEach {
-                            Timber.i(it.toString())
                             val cornerSize: Float =
                                 min(it.location.width(), it.location.height()) / 8.0f
+                            val width = exteriorPaint.measureText(it.title)
+                            val textSize = exteriorPaint.textSize
+                            val paint = Paint(paintConfig)
+                            paint.style = Paint.Style.FILL
+                            paint.alpha = 160
+                            val posX = it.location.left + cornerSize
+                            val posY = it.location.top
+
+                            val labelString = if (!TextUtils.isEmpty(it.title)) String.format(
+                                "%s %.2f", it.title,
+                                100 * it.confidence
+                            ) else String.format("%.2f", 100 * it.confidence)
+
                             drawContext.canvas.nativeCanvas.apply {
                                 drawRoundRect(
                                     RectF(
@@ -146,9 +192,19 @@ class TestActivity : ComponentActivity() {
                                     cornerSize,
                                     paintConfig
                                 )
+                                drawRect(
+                                    posX * scaleX,
+                                    (posY + textSize.toInt()) * scaleY,
+                                    (posX + width.toInt()* scaleX) * scaleX,
+                                    posY* scaleY,
+                                    paint
+                                )
+
+                                drawText(labelString, posX*scaleX, (posY + textSize.toInt() -10)*scaleY, interiorPaint)
                             }
                         }
                     }
+
                 }
             }
         }
