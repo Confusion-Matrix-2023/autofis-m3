@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import me.siddheshkothadi.autofism3.detection.env.ImageUtils
 import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import me.siddheshkothadi.autofism3.detection.tflite.DetectorFactory
+import me.siddheshkothadi.autofism3.utils.fillBytes
 import timber.log.Timber
 import java.util.*
 
@@ -35,7 +36,6 @@ class FishAnalyzer(
 
         if (image != null) {
             coroutineScope.launch(Dispatchers.IO) {
-//                480, 640
                 val previewHeight = image.height
                 val previewWidth = image.width
 
@@ -158,18 +158,6 @@ class FishAnalyzer(
             Surface.ROTATION_180 -> 180
             Surface.ROTATION_90 -> 90
             else -> 0
-        }
-    }
-
-    private fun fillBytes(planes: Array<Plane>, yuvBytes: Array<ByteArray?>) {
-        // Because of the variable row stride it's not possible to know in
-        // advance the actual necessary dimensions of the yuv planes.
-        for (i in planes.indices) {
-            val buffer = planes[i].buffer
-            if (yuvBytes[i] == null) {
-                yuvBytes[i] = ByteArray(buffer.capacity())
-            }
-            buffer[yuvBytes[i]]
         }
     }
 

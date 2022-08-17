@@ -2,8 +2,12 @@ package me.siddheshkothadi.autofism3.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Matrix
+import android.media.Image
 import androidx.camera.core.ImageProxy
+import me.siddheshkothadi.autofism3.detection.env.ImageUtils
+import timber.log.Timber
 
 
 fun ImageProxy.getBitmap(): Bitmap {
@@ -11,7 +15,8 @@ fun ImageProxy.getBitmap(): Bitmap {
     buffer.rewind()
     val bytes = ByteArray(buffer.capacity())
     buffer.get(bytes)
-    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size).rotate(imageInfo.rotationDegrees.toFloat())
+    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        .rotate(imageInfo.rotationDegrees.toFloat())
 }
 
 fun Bitmap.rotate(degrees: Float): Bitmap =
@@ -30,8 +35,14 @@ fun Bitmap.getQualityNumber(): Int {
     }
 }
 
-fun toBitmap(image: ImageProxy): Bitmap? {
-    val bitmapBuffer = Bitmap.createBitmap(image.width, image.height, Bitmap.Config.ARGB_8888)
-    bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
-    return bitmapBuffer
+fun fillBytes(planes: Array<Image.Plane>, yuvBytes: Array<ByteArray?>) {
+    // Because of the variable row stride it's not possible to know in
+    // advance the actual necessary dimensions of the yuv planes.
+    for (i in planes.indices) {
+        val buffer = planes[i].buffer
+        if (yuvBytes[i] == null) {
+            yuvBytes[i] = ByteArray(buffer.capacity())
+        }
+        buffer[yuvBytes[i]]
+    }
 }

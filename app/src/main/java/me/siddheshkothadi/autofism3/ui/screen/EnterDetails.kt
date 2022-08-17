@@ -90,8 +90,8 @@ fun EnterDetails(
         }
     ) {
         if (isLoading) {
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+            Box(Modifier.fillMaxWidth().padding(vertical = 20.dp), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(Modifier.size(24.dp))
             }
         } else {
             Column(
@@ -105,11 +105,12 @@ fun EnterDetails(
                     model = Uri.parse(fishImageUri),
                     contentDescription = "Fish image",
                     modifier = Modifier
+                        .aspectRatio(1f)
                         .padding(vertical = 12.dp)
-                        .size(256.dp)
-                        .clip(CircleShape)
-                        .border(4.dp, MaterialTheme.colorScheme.onSurface, CircleShape),
-                    contentScale = ContentScale.Crop
+                        .size(150.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(12.dp)),
+//                    contentScale = ContentScale.Crop
                 )
 
                 Text(date)
