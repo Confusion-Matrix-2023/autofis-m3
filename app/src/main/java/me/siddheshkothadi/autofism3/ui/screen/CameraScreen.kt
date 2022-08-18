@@ -1,15 +1,12 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
-import android.text.TextUtils
-import android.util.TypedValue
+import android.util.Rational
+import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -21,18 +18,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishAnalyzer
+import me.siddheshkothadi.autofism3.MainViewModel
+import me.siddheshkothadi.autofism3.detection.Constants
 import me.siddheshkothadi.autofism3.detection.tflite.Classifier
+import me.siddheshkothadi.autofism3.detection.tflite.YoloV5Classifier
 import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.utils.getBitmap
 import me.siddheshkothadi.autofism3.utils.getUri
@@ -40,12 +44,14 @@ import me.siddheshkothadi.autofism3.utils.storeBitmap
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
+import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
 @Composable
 fun CameraScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    mainViewModel: MainViewModel
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
@@ -58,54 +64,17 @@ fun CameraScreen(
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var imageUri: String by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var dialogText by remember { mutableStateOf("") }
 
-    var bitmapHeight: Int by remember {
-        mutableStateOf(0)
-    }
-    var bitmapWidth: Int by remember {
-        mutableStateOf(0)
+    var bitmap: Bitmap? by remember {
+        mutableStateOf(null)
     }
 
-    var results: List<Classifier.Recognition> by remember {
-        mutableStateOf(listOf())
-    }
-
-    val paintConfig = remember {
-        Paint().apply {
-            color = Color.BLUE
-            strokeWidth = 10.0f
-            style = Paint.Style.STROKE
-            strokeCap = Paint.Cap.ROUND
-            strokeJoin = Paint.Join.ROUND
-            strokeMiter = 100f
-        }
-    }
-
-    val textSizePx = remember {
-        TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            15f,
-            context.resources.displayMetrics
-        )
-    }
-
-    val interiorPaint = remember {
-        Paint().apply {
-            textSize = textSizePx
-            color = Color.WHITE
-            style = Paint.Style.FILL
-            isAntiAlias = false
-            alpha = 255
-        }
-    }
-
-    val exteriorPaint = remember {
-        Paint().apply {
-            textSize = textSizePx
-            color = Color.BLUE
-            style = Paint.Style.FILL
-            isAntiAlias = false
-            alpha = 255
+    val fishAnalyzer = remember {
+        mainViewModel.detector?.let {
+            FishAnalyzer(coroutineScope, it) { bmp ->
+                bitmap = bmp
+            }
         }
     }
 
@@ -150,14 +119,12 @@ fun CameraScreen(
                                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                                 .build()
                                 .apply {
-                                    setAnalyzer(
-                                        executor,
-                                        FishAnalyzer(context, coroutineScope) { h, w, r ->
-                                            bitmapHeight = h
-                                            bitmapWidth = w
-                                            results = r
-                                        }
-                                    )
+                                    if (fishAnalyzer != null) {
+                                        setAnalyzer(
+                                            executor,
+                                            fishAnalyzer
+                                        )
+                                    }
                                 }
 
                             cameraProvider.unbindAll()
@@ -175,58 +142,6 @@ fun CameraScreen(
                         .aspectRatio(1f)
                         .fillMaxSize(),
                 )
-                Canvas(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .fillMaxSize()
-                ) {
-                    val scaleY = size.height * 1f / bitmapWidth
-                    val scaleX = size.width * 1f / bitmapHeight
-                    results.forEach {
-                        val cornerSize: Float =
-                            min(it.location.width(), it.location.height()) / 8.0f
-                        val width = exteriorPaint.measureText(it.title)
-                        val textSize = exteriorPaint.textSize
-                        val paint = Paint(paintConfig)
-                        paint.style = Paint.Style.FILL
-                        paint.alpha = 160
-                        val posX = it.location.left + cornerSize
-                        val posY = it.location.top
-
-                        val labelString = if (!TextUtils.isEmpty(it.title)) String.format(
-                            "%s %.2f", it.title,
-                            100 * it.confidence
-                        ) else String.format("%.2f", 100 * it.confidence)
-
-                        drawContext.canvas.nativeCanvas.apply {
-                            drawRoundRect(
-                                RectF(
-                                    it.location.left * scaleX,
-                                    it.location.top * scaleY,
-                                    it.location.right * scaleX,
-                                    it.location.bottom * scaleY
-                                ),
-                                cornerSize,
-                                cornerSize,
-                                paintConfig
-                            )
-                            drawRect(
-                                posX * scaleX,
-                                (posY + textSize.toInt()) * scaleY,
-                                (posX + width.toInt() * scaleX) * scaleX,
-                                posY * scaleY,
-                                paint
-                            )
-
-                            drawText(
-                                labelString,
-                                posX * scaleX,
-                                (posY + textSize.toInt() - 10) * scaleY,
-                                interiorPaint
-                            )
-                        }
-                    }
-                }
             }
             Row(
                 modifier = Modifier
@@ -276,65 +191,98 @@ fun CameraScreen(
                     Timber.i("Clicked at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                     coroutineScope.launch {
                         isLoading = true
-                        imageCapture?.takePicture(
-                            ContextCompat.getMainExecutor(context),
-                            object : ImageCapture.OnImageCapturedCallback() {
-                                @ExperimentalGetImage
-                                override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                                    coroutineScope.launch {
-                                        try {
-                                            isLoading = true
-                                            withContext(Dispatchers.IO) {
-                                                // TODO: Below line consumes time (>1sec)
-                                                val bitmap = imageProxy.getBitmap()
-                                                val minDimension = min(bitmap.width, bitmap.height)
-                                                val croppedBmp = if (bitmap.height > bitmap.width)
-                                                    Bitmap.createBitmap(
-                                                        bitmap,
-                                                        0,
-                                                        (bitmap.height - bitmap.width) / 2,
-                                                        minDimension,
-                                                        minDimension
-                                                    ) else
-                                                    Bitmap.createBitmap(
-                                                        bitmap,
-                                                        (bitmap.width - bitmap.height)/2,
-                                                        0,
-                                                        minDimension,
-                                                        minDimension
-                                                    )
-                                                val randomInt = Random.nextInt()
-                                                val imageFile = File(
-                                                    context.filesDir,
-                                                    "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg"
-                                                )
-                                                imageFile.storeBitmap(context, croppedBmp)
-                                                imageUri = URLEncoder.encode(
-                                                    imageFile.getUri(context).toString(), "utf-8"
-                                                )
-                                                Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
+                        if (bitmap != null && mainViewModel.detector != null) {
+                            imageCapture?.takePicture(
+                                ContextCompat.getMainExecutor(context),
+                                object : ImageCapture.OnImageCapturedCallback() {
+                                    @ExperimentalGetImage
+                                    override fun onCaptureSuccess(imageProxy: ImageProxy) {
+                                        coroutineScope.launch {
+                                            try {
+                                                isLoading = true
+                                                dialogText = "Recognizing Fish in Image..."
+                                                withContext(Dispatchers.IO) {
+                                                    val results: List<Classifier.Recognition> =
+                                                        mainViewModel.detector.recognizeImage(
+                                                            bitmap
+                                                        )
+
+                                                    Timber.i(results.toString())
+
+                                                    val minimumConfidence: Float =
+                                                        Constants.MINIMUM_CONFIDENCE_TF_OD_API
+
+                                                    val mappedRecognitions: MutableList<Classifier.Recognition> =
+                                                        LinkedList<Classifier.Recognition>()
+
+                                                    for (result in results) {
+                                                        val location = result.location
+                                                        if (location != null && result.confidence >= minimumConfidence) {
+                                                            mappedRecognitions.add(result)
+                                                        }
+                                                    }
+
+                                                    Timber.i(mappedRecognitions.toString())
+
+                                                    imageUri = if (mappedRecognitions.isEmpty()) {
+                                                        Toast.makeText(context, "Fish not detected. Please try again.", Toast.LENGTH_LONG).show()
+                                                        ""
+                                                    } else {
+                                                        // File saving part
+                                                        dialogText = "Saving Image..."
+                                                        val bmp = imageProxy.getBitmap()
+                                                        val minDimension = min(bmp.width, bmp.height)
+                                                        val croppedBmp = if (bmp.height > bmp.width)
+                                                            Bitmap.createBitmap(
+                                                                bmp,
+                                                                0,
+                                                                (bmp.height - minDimension) / 2,
+                                                                minDimension,
+                                                                minDimension
+                                                            ) else
+                                                            Bitmap.createBitmap(
+                                                                bmp,
+                                                                (bmp.width - minDimension)/2,
+                                                                0,
+                                                                minDimension,
+                                                                minDimension
+                                                            )
+                                                        val randomInt = Random.nextInt()
+                                                        val imageFile = File(
+                                                            context.filesDir,
+                                                            "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg"
+                                                        )
+                                                        imageFile.storeBitmap(context, croppedBmp)
+                                                        URLEncoder.encode(
+                                                            imageFile.getUri(context).toString(),
+                                                            "utf-8"
+                                                        )
+                                                    }
+                                                    Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
+                                                }
+                                            } catch (exception: Exception) {
+                                                Timber.e(exception)
+                                            } finally {
+                                                if (imageUri.isNotBlank()) {
+                                                    navController.navigate("enter-details/$imageUri")
+                                                }
+                                                isLoading = false
+                                                dialogText = ""
+                                                imageProxy.close()
                                             }
-                                        } catch (exception: Exception) {
-                                            Timber.e(exception)
-                                        } finally {
-                                            if (imageUri.isNotBlank()) {
-                                                navController.navigate("enter-details/$imageUri")
-                                            }
-                                            isLoading = false
-                                            imageProxy.close()
                                         }
                                     }
-                                }
 
-                                override fun onError(exception: ImageCaptureException) {
-                                    Timber.tag("Image Capture").e(exception.toString())
-                                    isLoading = false
+                                    override fun onError(exception: ImageCaptureException) {
+                                        Timber.tag("Image Capture").e(exception.toString())
+                                        isLoading = false
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 },
-                enabled = !(isLoading || results.isEmpty()),
+                enabled = !isLoading && bitmap != null,
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp)
             ) {
@@ -342,10 +290,24 @@ fun CameraScreen(
             }
 
             if (isLoading) {
-                CircularProgressIndicator(
-                    Modifier.align(Alignment.Center),
-                    color = androidx.compose.ui.graphics.Color(0xffffffff)
-                )
+                Dialog(onDismissRequest = { /*TODO*/ }) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .align(Alignment.Center)
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(dialogText, style = MaterialTheme.typography.labelLarge, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                        Spacer(Modifier.height(12.dp))
+                    }
+                }
             }
         }
     }

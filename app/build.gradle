@@ -75,7 +75,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-permissions:0.24.3-alpha"
 
     // splash screen
-    implementation "androidx.core:core-splashscreen:1.0.0-beta01"
+    implementation "androidx.core:core-splashscreen:1.0.0"
 
     // Timber for logging
     implementation 'com.jakewharton.timber:timber:5.0.1'

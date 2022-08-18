@@ -91,12 +91,12 @@ public class YoloV5Classifier implements Classifier {
 
         try {
             Interpreter.Options options = (new Interpreter.Options());
-            options.setNumThreads(NUM_THREADS);
             if(compatList.isDelegateSupportedOnThisDevice()){
                 // if the device has a supported GPU, add the GPU delegate
-                GpuDelegate.Options delegateOptions = compatList.getBestOptionsForThisDevice();
-                GpuDelegate gpuDelegate = new GpuDelegate(delegateOptions);
-                options.addDelegate(gpuDelegate);
+                options.setNumThreads(NUM_THREADS);
+//                GpuDelegate.Options delegateOptions = compatList.getBestOptionsForThisDevice();
+//                GpuDelegate gpuDelegate = new GpuDelegate(delegateOptions);
+//                options.addDelegate(gpuDelegate);
             } else {
                 // if the GPU is not supported, run on 4 threads
                 options.setNumThreads(4);

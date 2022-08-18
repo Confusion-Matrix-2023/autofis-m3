@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,13 +37,19 @@ import timber.log.Timber
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val mainViewModel: MainViewModel by viewModels()
+
     @OptIn(
         ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class,
         ExperimentalPermissionsApi::class
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        installSplashScreen()
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                mainViewModel.detector == null
+            }
+        }
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -138,7 +145,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = Screen.Capture.route,
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        captureGraph(navController)
+                        captureGraph(navController, mainViewModel)
                         composable(Screen.History.route) {
                             val historyViewModel: HistoryViewModel = hiltViewModel()
                             History(historyViewModel)
