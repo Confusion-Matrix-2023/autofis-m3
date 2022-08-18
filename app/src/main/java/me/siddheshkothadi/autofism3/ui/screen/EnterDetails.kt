@@ -106,12 +106,10 @@ fun EnterDetails(
                     contentDescription = "Fish image",
                     modifier = Modifier
                         .aspectRatio(1f)
-                        .padding(vertical = 12.dp)
-                        .size(150.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(12.dp)),
-//                    contentScale = ContentScale.Crop
                 )
+
+                Spacer(Modifier.height(18.dp))
 
                 Text(date)
                 Text(time)

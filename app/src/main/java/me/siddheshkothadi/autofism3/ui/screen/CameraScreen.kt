@@ -1,5 +1,6 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
@@ -286,16 +287,37 @@ fun CameraScreen(
                                             withContext(Dispatchers.IO) {
                                                 // TODO: Below line consumes time (>1sec)
                                                 val bitmap = imageProxy.getBitmap()
+                                                val minDimension = min(bitmap.width, bitmap.height)
+                                                val croppedBmp = if (bitmap.height > bitmap.width)
+                                                    Bitmap.createBitmap(
+                                                        bitmap,
+                                                        0,
+                                                        (bitmap.height - bitmap.width) / 2,
+                                                        minDimension,
+                                                        minDimension
+                                                    ) else
+                                                    Bitmap.createBitmap(
+                                                        bitmap,
+                                                        (bitmap.width - bitmap.height)/2,
+                                                        0,
+                                                        minDimension,
+                                                        minDimension
+                                                    )
                                                 val randomInt = Random.nextInt()
-                                                val imageFile = File(context.filesDir, "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg")
-                                                imageFile.storeBitmap(context, bitmap)
-                                                imageUri = URLEncoder.encode(imageFile.getUri(context).toString(), "utf-8")
+                                                val imageFile = File(
+                                                    context.filesDir,
+                                                    "fish_image_${System.currentTimeMillis()}_${randomInt}.jpg"
+                                                )
+                                                imageFile.storeBitmap(context, croppedBmp)
+                                                imageUri = URLEncoder.encode(
+                                                    imageFile.getUri(context).toString(), "utf-8"
+                                                )
                                                 Timber.i("Done at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                                             }
-                                        } catch(exception: Exception) {
+                                        } catch (exception: Exception) {
                                             Timber.e(exception)
                                         } finally {
-                                            if(imageUri.isNotBlank()) {
+                                            if (imageUri.isNotBlank()) {
                                                 navController.navigate("enter-details/$imageUri")
                                             }
                                             isLoading = false

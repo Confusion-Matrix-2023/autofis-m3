@@ -31,7 +31,7 @@ class FishAnalyzer(
 
     @androidx.camera.core.ExperimentalGetImage
     override fun analyze(imageProxy: ImageProxy) {
-//        detector.useGpu()
+        detector.useGpu()
         val image = imageProxy.image
 
         if (image != null) {

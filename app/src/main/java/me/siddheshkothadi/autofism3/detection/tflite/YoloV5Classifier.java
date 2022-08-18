@@ -27,6 +27,8 @@ import org.tensorflow.lite.Tensor;
 import me.siddheshkothadi.autofism3.detection.Constants;
 import me.siddheshkothadi.autofism3.detection.env.Logger;
 import me.siddheshkothadi.autofism3.detection.env.Utils;
+
+import org.tensorflow.lite.gpu.CompatibilityList;
 import org.tensorflow.lite.gpu.GpuDelegate;
 import org.tensorflow.lite.nnapi.NnApiDelegate;
 
@@ -80,6 +82,7 @@ public class YoloV5Classifier implements Classifier {
         InputStream labelsInput = assetManager.open(actualFilename);
         BufferedReader br = new BufferedReader(new InputStreamReader(labelsInput));
         String line;
+        CompatibilityList compatList = new CompatibilityList();
         while ((line = br.readLine()) != null) {
             LOGGER.w(line);
             d.labels.add(line);
@@ -89,26 +92,28 @@ public class YoloV5Classifier implements Classifier {
         try {
             Interpreter.Options options = (new Interpreter.Options());
             options.setNumThreads(NUM_THREADS);
-            if (isNNAPI) {
-                d.nnapiDelegate = null;
-                // Initialize interpreter with NNAPI delegate for Android Pie or above
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    d.nnapiDelegate = new NnApiDelegate();
-                    options.addDelegate(d.nnapiDelegate);
-                    options.setNumThreads(NUM_THREADS);
-//                    options.setUseNNAPI(false);
-//                    options.setAllowFp16PrecisionForFp32(true);
-//                    options.setAllowBufferHandleOutput(true);
-                    options.setUseNNAPI(true);
-                }
+            if(compatList.isDelegateSupportedOnThisDevice()){
+                // if the device has a supported GPU, add the GPU delegate
+                GpuDelegate.Options delegateOptions = compatList.getBestOptionsForThisDevice();
+                GpuDelegate gpuDelegate = new GpuDelegate(delegateOptions);
+                options.addDelegate(gpuDelegate);
+            } else {
+                // if the GPU is not supported, run on 4 threads
+                options.setNumThreads(4);
             }
-            if (isGPU) {
-                GpuDelegate.Options gpu_options = new GpuDelegate.Options();
-                gpu_options.setPrecisionLossAllowed(true); // It seems that the default is true
-                gpu_options.setInferencePreference(GpuDelegate.Options.INFERENCE_PREFERENCE_SUSTAINED_SPEED);
-                d.gpuDelegate = new GpuDelegate(gpu_options);
-                options.addDelegate(d.gpuDelegate);
-            }
+//            if (isNNAPI) {
+//                d.nnapiDelegate = null;
+//                // Initialize interpreter with NNAPI delegate for Android Pie or above
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//                    d.nnapiDelegate = new NnApiDelegate();
+//                    options.addDelegate(d.nnapiDelegate);
+//                    options.setNumThreads(NUM_THREADS);
+////                    options.setUseNNAPI(false);
+////                    options.setAllowFp16PrecisionForFp32(true);
+////                    options.setAllowBufferHandleOutput(true);
+//                    options.setUseNNAPI(true);
+//                }
+//            }
             d.tfliteModel = Utils.loadModelFile(assetManager, modelFilename);
             d.tfLite = new Interpreter(d.tfliteModel, options);
         } catch (Exception e) {
