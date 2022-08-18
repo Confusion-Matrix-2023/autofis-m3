@@ -105,6 +105,8 @@ fun EnterDetails(
                     model = Uri.parse(fishImageUri),
                     contentDescription = "Fish image",
                     modifier = Modifier
+                        .height(256.dp)
+                        .width(256.dp)
                         .aspectRatio(1f)
                         .clip(RoundedCornerShape(12.dp))
                 )
