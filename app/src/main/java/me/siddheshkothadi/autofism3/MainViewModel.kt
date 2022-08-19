@@ -39,21 +39,21 @@ class MainViewModel @Inject constructor(
 
     init {
         Timber.i("Init Block")
-        viewModelScope.launch(Dispatchers.IO) {
-            viewModelScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(Dispatchers.Main) {
+//            viewModelScope.launch(Dispatchers.Main) {
                 isLoading.value = true
-            }
-            viewModelScope.launch(Dispatchers.Main) {
+//            }
+//            viewModelScope.launch(Dispatchers.Main) {
                 checkLanguage()
-            }
+//            }
             detector.value = DetectorFactory.getDetector(
                 app.assets,
                 Constants.MODEL_FILE_PATH
             )
 
-            viewModelScope.launch(Dispatchers.Main) {
+//            viewModelScope.launch(Dispatchers.Main) {
                 isLoading.value = false
-            }
+//            }
         }
     }
 

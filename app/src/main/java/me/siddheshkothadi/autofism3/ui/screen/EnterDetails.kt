@@ -143,7 +143,7 @@ fun EnterDetails(
                         .clip(RoundedCornerShape(12.dp))
                 )
 
-                Button(
+                TextButton(
                     modifier = Modifier
                         .width(300.dp)
                         .padding(vertical = 24.dp),
