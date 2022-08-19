@@ -16,7 +16,7 @@ sealed class Screen(
     object Capture : Screen("capture", R.string.capture, Icons.Outlined.Camera, Icons.Filled.Camera)
     object Camera : Screen("camera", R.string.capture, Icons.Outlined.Camera, Icons.Filled.Camera)
     object EnterDetails :
-        Screen("enter-details/{uri}", R.string.enterDetails, Icons.Outlined.Camera, Icons.Filled.Camera)
+        Screen("enter-details/{uri}", R.string.enter_details, Icons.Outlined.Camera, Icons.Filled.Camera)
 
     object History :
         Screen("history", R.string.history, Icons.Outlined.History, Icons.Filled.History)
@@ -31,4 +31,7 @@ sealed class Screen(
     object Stats : Screen("stats", R.string.stats, Icons.Outlined.AreaChart, Icons.Filled.AreaChart)
     object Settings :
         Screen("settings", R.string.settings, Icons.Outlined.Settings, Icons.Filled.Settings)
+
+    object SelectLanguage :
+            Screen("select-language", R.string.select_language, Icons.Outlined.Settings, Icons.Filled.Settings)
 }

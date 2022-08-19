@@ -1,7 +1,6 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
 import android.graphics.Bitmap
-import android.util.Rational
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -9,6 +8,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.FlashOff
@@ -18,10 +18,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -30,13 +30,12 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishAnalyzer
 import me.siddheshkothadi.autofism3.MainViewModel
-import me.siddheshkothadi.autofism3.detection.Constants
+import me.siddheshkothadi.autofism3.R
+import me.siddheshkothadi.autofism3.Constants
 import me.siddheshkothadi.autofism3.detection.tflite.Classifier
-import me.siddheshkothadi.autofism3.detection.tflite.YoloV5Classifier
 import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.utils.getBitmap
 import me.siddheshkothadi.autofism3.utils.getUri
@@ -56,6 +55,8 @@ fun CameraScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
 
+    val detector by remember { mainViewModel.detector }
+
     val coroutineScope = rememberCoroutineScope()
 
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -71,7 +72,7 @@ fun CameraScreen(
     }
 
     val fishAnalyzer = remember {
-        mainViewModel.detector?.let {
+        detector?.let {
             FishAnalyzer(coroutineScope, it) { bmp ->
                 bitmap = bmp
             }
@@ -174,7 +175,7 @@ fun CameraScreen(
                     )
                 }
                 Text(
-                    "AutoFIS",
+                    stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.titleLarge
                 )
                 IconButton(onClick = { /*TODO*/ }) {
@@ -191,7 +192,7 @@ fun CameraScreen(
                     Timber.i("Clicked at ${DateUtils.getTimeSec(System.currentTimeMillis())}")
                     coroutineScope.launch {
                         isLoading = true
-                        if (bitmap != null && mainViewModel.detector != null) {
+                        if (bitmap != null && detector != null) {
                             imageCapture?.takePicture(
                                 ContextCompat.getMainExecutor(context),
                                 object : ImageCapture.OnImageCapturedCallback() {
@@ -203,7 +204,7 @@ fun CameraScreen(
                                                 dialogText = "Recognizing Fish in Image..."
                                                 withContext(Dispatchers.IO) {
                                                     val results: List<Classifier.Recognition> =
-                                                        mainViewModel.detector.recognizeImage(
+                                                        detector!!.recognizeImage(
                                                             bitmap
                                                         )
 
@@ -295,6 +296,7 @@ fun CameraScreen(
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
                             .align(Alignment.Center)
+                            .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surface)
                             .padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,

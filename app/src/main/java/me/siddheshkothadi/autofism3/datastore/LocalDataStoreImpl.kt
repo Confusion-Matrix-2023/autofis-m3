@@ -1,6 +1,7 @@
 package me.siddheshkothadi.autofism3.datastore
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.provider.Settings
 import androidx.datastore.core.DataStore
@@ -64,7 +65,8 @@ class LocalDataStoreImpl @Inject constructor(
         return "$deviceName-$randomString-$timestamp-$uniqueID"
     }
 
-    private fun getPersistentDeviceId(): String = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
+    private fun getPersistentDeviceId(): String =
+        Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
 
     private fun generateJWT(generatedDeviceId: String): String {
         return Jwts.builder()
@@ -85,14 +87,13 @@ class LocalDataStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun setLocalData(): LocalData {
+    override suspend fun setDeviceIdAndBearerToken() {
         val generatedDeviceId = getPersistentDeviceId()
         val jwt = generateJWT(generatedDeviceId)
         val generatedBearerToken = "Bearer $jwt"
         Timber.i(generatedBearerToken)
         setDeviceId(generatedDeviceId)
         setBearerToken(generatedBearerToken)
-        return LocalData(generatedDeviceId, generatedBearerToken)
     }
 
     companion object {

@@ -62,7 +62,8 @@ class FishRepositoryImpl(
     private suspend fun getBearerToken(): String {
         val bearerToken = localDataStore.bearerToken.first()
         if (bearerToken.isNotBlank()) return bearerToken
-        return localDataStore.setLocalData().bearerToken
+        localDataStore.setDeviceIdAndBearerToken()
+        return localDataStore.bearerToken.first()
     }
 
     override suspend fun enqueueUpload(fish: PendingUploadFish) {

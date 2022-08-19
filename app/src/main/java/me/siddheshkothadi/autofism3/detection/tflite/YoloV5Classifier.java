@@ -18,13 +18,12 @@ package me.siddheshkothadi.autofism3.detection.tflite;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.os.Build;
 import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.Tensor;
 
-import me.siddheshkothadi.autofism3.detection.Constants;
+import me.siddheshkothadi.autofism3.Constants;
 import me.siddheshkothadi.autofism3.detection.env.Logger;
 import me.siddheshkothadi.autofism3.detection.env.Utils;
 

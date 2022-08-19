@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ऑटोफिस</string>
+    <string name="history">इतिहास</string>
+    <string name="learn">सीखना</string>
+    <string name="capture">फोटो लो</string>
+    <string name="stats">आँकड़े</string>
+    <string name="settings">समायोजन</string>
+    <string name="enter_details">विवरण दर्ज करें</string>
+    <string name="camera">कैमरा</string>
+    <string name="quantity_label">मात्रा (किलो में)</string>
+    <string name="select_language">भाषा का चयन करें</string>
+    <string name="select">चयन करें</string>
+</resources>

@@ -26,7 +26,7 @@ import android.util.Log;
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.Tensor;
 
-import me.siddheshkothadi.autofism3.detection.Constants;
+import me.siddheshkothadi.autofism3.Constants;
 import me.siddheshkothadi.autofism3.detection.env.Logger;
 import me.siddheshkothadi.autofism3.detection.env.Utils;
 import org.tensorflow.lite.gpu.GpuDelegate;
