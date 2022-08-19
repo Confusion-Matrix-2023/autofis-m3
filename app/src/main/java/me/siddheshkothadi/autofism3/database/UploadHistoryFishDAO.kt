@@ -13,4 +13,10 @@ interface UploadHistoryFishDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(uploadHistoryFishEntity: UploadHistoryFishEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertMany(list: List<UploadHistoryFishEntity>)
+
+    @Query("DELETE FROM uploadhistoryfishentity")
+    fun deleteAll()
 }

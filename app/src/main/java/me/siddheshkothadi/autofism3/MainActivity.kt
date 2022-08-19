@@ -1,6 +1,5 @@
 package me.siddheshkothadi.autofism3
 
-import android.Manifest
 import android.content.Context
 import android.content.ContextWrapper
 import android.os.Bundle
@@ -8,15 +7,9 @@ import android.preference.PreferenceManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.LaunchedEffect
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.ui.nav.MainNavGraph
@@ -46,19 +39,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AutoFISM3Theme {
-                val permissionsState = rememberMultiplePermissionsState(
-                    permissions = listOf(
-                        Manifest.permission.CAMERA,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                    )
-                )
-                LaunchedEffect(permissionsState) {
-                    if (!permissionsState.allPermissionsGranted) {
-                        permissionsState.launchMultiplePermissionRequest()
-                    }
-                }
                 MainNavGraph(this, mainViewModel = mainViewModel) {
                     recreate()
                 }
@@ -68,9 +48,9 @@ class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(newBase)
-        if(sharedPref != null) {
+        if (sharedPref != null) {
             val languageLocale = sharedPref.getString(Constants.LANGUAGE_KEY, "")
-            if(!languageLocale.isNullOrBlank()) {
+            if (!languageLocale.isNullOrBlank()) {
                 // Language set, use that language
                 super.attachBaseContext(ContextWrapper(newBase.setAppLocale(languageLocale)))
                 return

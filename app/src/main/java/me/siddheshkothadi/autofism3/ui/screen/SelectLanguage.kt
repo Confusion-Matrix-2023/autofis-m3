@@ -65,7 +65,7 @@ fun SelectLanguage(
             }
         }
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
-            TextButton(onClick = {
+            ElevatedButton(onClick = {
                 mainViewModel.onLanguageChosen {
                     recreateActivity()
                 }

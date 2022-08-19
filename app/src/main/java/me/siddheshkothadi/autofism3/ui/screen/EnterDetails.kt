@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
+import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.ui.component.MapView
 import me.siddheshkothadi.autofism3.ui.nav.Screen
 import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
@@ -127,7 +128,7 @@ fun EnterDetails(
                     ),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     label = {
-                        Text("Quantity (in kg)", color = Color.Gray)
+                        Text(stringResource(R.string.quantity_label), color = Color.Gray)
                     },
                     isError = quantityError,
                     modifier = Modifier
@@ -151,7 +152,7 @@ fun EnterDetails(
                             quantityError = true
                             Toast.makeText(
                                 context,
-                                "Please enter a valid quantity",
+                                context.getString(R.string.please_enter_a_valid_quantity),
                                 Toast.LENGTH_LONG
                             ).show()
                         } else {
@@ -173,7 +174,7 @@ fun EnterDetails(
                             }
                         }
                     }) {
-                    Text("Submit")
+                    Text(stringResource(R.string.submit))
                 }
             }
         }

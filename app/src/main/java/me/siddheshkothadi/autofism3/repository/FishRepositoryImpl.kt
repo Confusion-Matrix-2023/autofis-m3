@@ -165,9 +165,12 @@ class FishRepositoryImpl(
 
         try {
             val updatedUploadHistory = fileAPI.getHistory(bearerToken)
-            updatedUploadHistory.map {
-                uploadHistoryFishDAO.insert(it.toUploadHistoryFishEntity())
-            }
+            uploadHistoryFishDAO.deleteAll()
+            uploadHistoryFishDAO.insertMany(
+                updatedUploadHistory.map {
+                    it.toUploadHistoryFishEntity()
+                }
+            )
         } catch (exception: Exception) {
             Timber.e(exception)
         }

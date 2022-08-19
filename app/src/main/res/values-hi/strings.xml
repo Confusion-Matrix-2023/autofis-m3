@@ -11,4 +11,9 @@
     <string name="quantity_label">मात्रा (किलो में)</string>
     <string name="select_language">भाषा का चयन करें</string>
     <string name="select">चयन करें</string>
+    <string name="please_enter_a_valid_quantity">कृपया एक मान्य मात्रा दर्ज करें</string>
+    <string name="submit">सबमिट</string>
+    <string name="recognizing_fish_in_image">छवि में मछली की पहचान चल रही है</string>
+    <string name="fish_not_detected_please_try_again">फोटो में मछली नहीं मिली। कृपया पुन: प्रयास करें।</string>
+    <string name="saving_image">फोटो सहेजा जा रहा है</string>
 </resources>

@@ -10,4 +10,9 @@
     <string name="quantity_label">Quantity (in kg)</string>
     <string name="select_language">Select Language</string>
     <string name="select">Select</string>
+    <string name="please_enter_a_valid_quantity">Please enter a valid quantity</string>
+    <string name="submit">Submit</string>
+    <string name="recognizing_fish_in_image">Recognizing Fish in Image</string>
+    <string name="fish_not_detected_please_try_again">Fish not detected. Please try again.</string>
+    <string name="saving_image">Saving Image</string>
 </resources>

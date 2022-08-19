@@ -73,14 +73,14 @@ class MainViewModel @Inject constructor(
 
     fun onLanguageChosen(recreateActivity: () -> Unit) {
         setLanguage(selectedLanguage.value.locale)
-        recreateActivity()
         checkLanguage()
+        recreateActivity()
     }
 
     private fun setLanguage(language: String) {
         with(sharedPref.edit()) {
             putString(Constants.LANGUAGE_KEY, language)
-            apply()
+            commit()
         }
     }
 }

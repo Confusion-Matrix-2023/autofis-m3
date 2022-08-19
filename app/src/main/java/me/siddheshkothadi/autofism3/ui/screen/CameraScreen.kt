@@ -1,5 +1,6 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
+import android.Manifest
 import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.camera.core.*
@@ -28,6 +29,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,6 +50,7 @@ import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen(
     navController: NavHostController,
@@ -54,6 +58,21 @@ fun CameraScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
+
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+        )
+    )
+
+    LaunchedEffect(permissionsState) {
+        if (!permissionsState.allPermissionsGranted) {
+            permissionsState.launchMultiplePermissionRequest()
+        }
+    }
 
     val detector by remember { mainViewModel.detector }
 
@@ -201,7 +220,7 @@ fun CameraScreen(
                                         coroutineScope.launch {
                                             try {
                                                 isLoading = true
-                                                dialogText = "Recognizing Fish in Image..."
+                                                dialogText = context.getString(R.string.recognizing_fish_in_image)
                                                 withContext(Dispatchers.IO) {
                                                     val results: List<Classifier.Recognition> =
                                                         detector!!.recognizeImage(
@@ -226,11 +245,13 @@ fun CameraScreen(
                                                     Timber.i(mappedRecognitions.toString())
 
                                                     imageUri = if (mappedRecognitions.isEmpty()) {
-                                                        Toast.makeText(context, "Fish not detected. Please try again.", Toast.LENGTH_LONG).show()
+                                                        withContext(Dispatchers.Main) {
+                                                            Toast.makeText(context, context.getString(R.string.fish_not_detected_please_try_again), Toast.LENGTH_LONG).show()
+                                                        }
                                                         ""
                                                     } else {
                                                         // File saving part
-                                                        dialogText = "Saving Image..."
+                                                        dialogText = context.getString(R.string.saving_image)
                                                         val bmp = imageProxy.getBitmap()
                                                         val minDimension = min(bmp.width, bmp.height)
                                                         val croppedBmp = if (bmp.height > bmp.width)
@@ -298,7 +319,7 @@ fun CameraScreen(
                             .align(Alignment.Center)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surface)
-                            .padding(24.dp),
+                            .padding(36.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -307,7 +328,7 @@ fun CameraScreen(
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(dialogText, style = MaterialTheme.typography.labelLarge, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(24.dp))
                     }
                 }
             }
