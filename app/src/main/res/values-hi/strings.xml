@@ -16,4 +16,5 @@
     <string name="recognizing_fish_in_image">छवि में मछली की पहचान चल रही है</string>
     <string name="fish_not_detected_please_try_again">फोटो में मछली नहीं मिली। कृपया पुन: प्रयास करें।</string>
     <string name="saving_image">फोटो सहेजा जा रहा है</string>
+    <string name="loading">लोड हो रहा है</string>
 </resources>

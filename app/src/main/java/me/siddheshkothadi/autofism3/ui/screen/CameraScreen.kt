@@ -321,14 +321,12 @@ fun CameraScreen(
                             .background(MaterialTheme.colorScheme.surface)
                             .padding(36.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(dialogText, style = MaterialTheme.typography.labelLarge, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                        Spacer(Modifier.height(24.dp))
                     }
                 }
             }

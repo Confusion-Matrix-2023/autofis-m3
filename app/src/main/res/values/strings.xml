@@ -15,4 +15,5 @@
     <string name="recognizing_fish_in_image">Recognizing Fish in Image</string>
     <string name="fish_not_detected_please_try_again">Fish not detected. Please try again.</string>
     <string name="saving_image">Saving Image</string>
+    <string name="loading">Loading</string>
 </resources>

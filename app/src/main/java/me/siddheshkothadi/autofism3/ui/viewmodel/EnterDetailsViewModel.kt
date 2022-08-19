@@ -52,12 +52,12 @@ class EnterDetailsViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val dateString = _timestamp.mapLatest { timestampString ->
-        DateUtils.getDate(timestampString)
+        DateUtils.getDate(app, timestampString)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val timeString = _timestamp.mapLatest { timestampString ->
-        DateUtils.getTime(timestampString)
+        DateUtils.getTime(app, timestampString)
     }
 
     init {
