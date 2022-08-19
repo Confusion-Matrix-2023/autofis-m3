@@ -22,6 +22,7 @@ import me.siddheshkothadi.autofism3.MainViewModel
 import me.siddheshkothadi.autofism3.ui.screen.EmptyScreen
 import me.siddheshkothadi.autofism3.ui.screen.History
 import me.siddheshkothadi.autofism3.ui.screen.SelectLanguage
+import me.siddheshkothadi.autofism3.ui.screen.SettingsScreen
 import me.siddheshkothadi.autofism3.ui.viewmodel.HistoryViewModel
 import timber.log.Timber
 
@@ -124,7 +125,7 @@ fun MainNavGraph(
                 EmptyScreen()
             }
             composable(Screen.Settings.route) {
-                EmptyScreen()
+                SettingsScreen(navController)
             }
             composable(Screen.SelectLanguage.route) {
                 SelectLanguage(mainViewModel, recreateActivity)

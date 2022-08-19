@@ -30,11 +30,6 @@ class MainViewModel @Inject constructor(
     val detector: MutableState<YoloV5Classifier?> = mutableStateOf(null)
     val isLoading = mutableStateOf(true)
 
-    val availableLanguages = listOf(
-        Language.ENGLISH,
-        Language.HINDI,
-    )
-
     var selectedLanguage = mutableStateOf(Language.ENGLISH)
 
     init {

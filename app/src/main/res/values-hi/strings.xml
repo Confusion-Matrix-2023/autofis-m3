@@ -3,7 +3,7 @@
     <string name="app_name">ऑटोफिस</string>
     <string name="history">इतिहास</string>
     <string name="learn">सीखना</string>
-    <string name="capture">फोटो लो</string>
+    <string name="capture">फोटो खिचो</string>
     <string name="stats">आँकड़े</string>
     <string name="settings">सेटिंग्स</string>
     <string name="enter_details">विवरण दर्ज करें</string>
@@ -17,4 +17,9 @@
     <string name="fish_not_detected_please_try_again">फोटो में मछली नहीं मिली। कृपया पुन: प्रयास करें।</string>
     <string name="saving_image">फोटो सहेजा जा रहा है</string>
     <string name="loading">लोड हो रहा है</string>
+    <string name="pending_uploads">लंबित अपलोड</string>
+    <string name="upload_history">पिछले अपलोड</string>
+    <string name="fetch">अपडेट करें</string>
+    <string name="language">भाषा</string>
+    <string name="chosen_language">चुनी हुई भाषा</string>
 </resources>

@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import me.siddheshkothadi.autofism3.Constants
 import me.siddheshkothadi.autofism3.MainViewModel
 import me.siddheshkothadi.autofism3.R
 
@@ -29,7 +30,7 @@ fun SelectLanguage(
 ) {
     val context = LocalContext.current
     val selectedLanguage by remember { mainViewModel.selectedLanguage }
-    val availableLanguages = remember { mainViewModel.availableLanguages }
+    val availableLanguages = remember { Constants.availableLanguages }
 
     Column(
         modifier = Modifier

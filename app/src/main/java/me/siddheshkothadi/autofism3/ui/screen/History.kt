@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.ui.component.AppBar
 import me.siddheshkothadi.autofism3.ui.component.PendingUploadCard
 import me.siddheshkothadi.autofism3.ui.component.UploadHistoryCard
@@ -60,7 +61,7 @@ fun History(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Pending Uploads",
+                            text = stringResource(R.string.pending_uploads),
                             style = MaterialTheme.typography.titleLarge,
                         )
                         if (workState?.any {
@@ -92,14 +93,14 @@ fun History(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Upload History",
+                        text = stringResource(R.string.upload_history),
                         style = MaterialTheme.typography.titleLarge,
                     )
                     if (isFetching) {
                         CircularProgressIndicator(Modifier.size(20.dp))
                     } else {
                         TextButton(onClick = { historyViewModel.fetchUploadHistory() }) {
-                            Text("Fetch")
+                            Text(stringResource(R.string.fetch))
                         }
                     }
                 }

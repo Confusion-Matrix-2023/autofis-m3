@@ -16,4 +16,9 @@
     <string name="fish_not_detected_please_try_again">Fish not detected. Please try again.</string>
     <string name="saving_image">Saving Image</string>
     <string name="loading">Loading</string>
+    <string name="pending_uploads">Pending Uploads</string>
+    <string name="upload_history">Upload History</string>
+    <string name="fetch">Fetch</string>
+    <string name="language">Language</string>
+    <string name="chosen_language">Chosen Language</string>
 </resources>
