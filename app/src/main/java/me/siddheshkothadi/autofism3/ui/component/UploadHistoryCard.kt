@@ -56,13 +56,15 @@ fun UploadHistoryCard(
                     Text(DateUtils.getDate(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
                     Text(DateUtils.getTime(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
                 }
-                IconButton(onClick = {
-                    val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
-                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    mapIntent.setPackage("com.google.android.apps.maps")
-                    context.startActivity(mapIntent)
-                }) {
-                    Icon(Icons.Filled.PinDrop, contentDescription = null)
+                if(fish.latitude.isNotBlank() && fish.longitude.isNotBlank()) {
+                    IconButton(onClick = {
+                        val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
+                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                        mapIntent.setPackage("com.google.android.apps.maps")
+                        context.startActivity(mapIntent)
+                    }) {
+                        Icon(Icons.Filled.PinDrop, contentDescription = null)
+                    }
                 }
             }
         }

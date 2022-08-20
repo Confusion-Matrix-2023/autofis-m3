@@ -63,22 +63,34 @@ class EnterDetailsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _isLoading.value = true
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
-            _timestamp.value = System.currentTimeMillis().toString()
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location: Location? ->
-                    // Got last known location. In some rare situations this can be null.
-                    _latitude.value = location?.latitude.toString()
-                    _longitude.value = location?.longitude.toString()
-                    Timber.i("$latitude, $longitude")
+            try {
+                viewModelScope.launch(Dispatchers.IO) {
+                    _timestamp.value = System.currentTimeMillis().toString()
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location: Location? ->
+                            // Got last known location. In some rare situations this can be null.
+                            _latitude.value = if(location?.latitude == null) {
+                                ""
+                            } else {
+                                location.latitude.toString()
+                            }
+                            _longitude.value = if(location?.longitude == null) {
+                                ""
+                            } else {
+                                location.longitude.toString()
+                            }
+                            Timber.i("$latitude, $longitude")
+                        }
+                        .addOnFailureListener { e ->
+                            Timber.e(e)
+                        }
                 }
-                .addOnFailureListener { e ->
-                    Timber.e(e)
-                }
-                .addOnCompleteListener {
-                    Timber.i("Complete")
-                    _isLoading.value = false
-                }
+            } catch (e: Exception) {
+                Timber.e(e)
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
