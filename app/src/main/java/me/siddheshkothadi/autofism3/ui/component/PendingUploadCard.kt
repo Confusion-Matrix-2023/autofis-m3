@@ -48,13 +48,13 @@ fun PendingUploadCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = DateUtils.getDate(fish.timestamp),
+                text = DateUtils.getDate(context, fish.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                 textAlign = TextAlign.Center
             )
             Text(
-                text = DateUtils.getTime(fish.timestamp),
+                text = DateUtils.getTime(context, fish.timestamp),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
             )
@@ -62,11 +62,6 @@ fun PendingUploadCard(
             if(workState.value?.state == WorkInfo.State.RUNNING) {
                 LinearProgressIndicator(Modifier.width(128.dp).padding(horizontal = 4.dp, vertical = 2.dp))
             }
-//            Text(
-//                text = "${fish.quantity} kg",
-//                style = MaterialTheme.typography.bodySmall,
-//                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-//            )
         }
     }
 }

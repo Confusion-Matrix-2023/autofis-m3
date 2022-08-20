@@ -2,10 +2,8 @@ package me.siddheshkothadi.autofism3.ui.screen
 
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -26,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -90,92 +87,90 @@ fun EnterDetails(
             }
         }
     ) {
-        if (isLoading) {
-            Box(Modifier.fillMaxWidth().padding(vertical = 20.dp), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(Modifier.size(24.dp))
-            }
-        } else {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AsyncImage(
-                    model = Uri.parse(fishImageUri),
-                    contentDescription = "Fish image",
-                    modifier = Modifier
-                        .height(256.dp)
-                        .width(256.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                )
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(top = 12.dp, start = 12.dp, end = 12.dp, bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AsyncImage(
+                model = Uri.parse(fishImageUri),
+                contentDescription = "Fish image",
+                modifier = Modifier
+                    .height(256.dp)
+                    .width(256.dp)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(12.dp))
+            )
 
-                Spacer(Modifier.height(18.dp))
+            Spacer(Modifier.height(18.dp))
 
-                Text(date)
-                Text(time)
+            Text(date)
+            Text(time)
 
-                OutlinedTextField(
-                    value = quantity,
-                    onValueChange = {
-                        enterDetailsViewModel.setQuantity(it)
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    label = {
-                        Text(stringResource(R.string.quantity_label), color = Color.Gray)
-                    },
-                    isError = quantityError,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                )
+            OutlinedTextField(
+                value = quantity,
+                onValueChange = {
+                    enterDetailsViewModel.setQuantity(it)
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                label = {
+                    Text(stringResource(R.string.quantity_label), color = Color.Gray)
+                },
+                isError = quantityError,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            )
 
+            if(latitude.isNotBlank() && longitude.isNotBlank()) {
                 MapView(
                     latitude, longitude,
                     Modifier
                         .size(256.dp)
                         .clip(RoundedCornerShape(12.dp))
                 )
+            } else {
+                CircularProgressIndicator(Modifier.size(20.dp))
+            }
 
-                TextButton(
-                    modifier = Modifier
-                        .width(300.dp)
-                        .padding(vertical = 24.dp),
-                    onClick = {
-                        if (quantity == "0" || quantity == "") {
-                            quantityError = true
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.please_enter_a_valid_quantity),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else {
-                            coroutineScope.launch {
-                                enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
-                                navController.navigate(Screen.History.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    // on the back stack as users select items
-                                    popUpTo(Screen.Camera.route) {
-                                        saveState = true
-                                    }
-                                    // Avoid multiple copies of the same destination when
-                                    // re-selecting the same item
-                                    launchSingleTop = true
-                                    // Restore state when re-selecting a previously selected item
-                                    restoreState = true
+            Button(
+                modifier = Modifier
+                    .width(300.dp)
+                    .padding(vertical = 24.dp),
+                onClick = {
+                    if (quantity == "0" || quantity == "") {
+                        quantityError = true
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.please_enter_a_valid_quantity),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        coroutineScope.launch {
+                            enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
+                            navController.navigate(Screen.History.route) {
+                                // Pop up to the start destination of the graph to
+                                // avoid building up a large stack of destinations
+                                // on the back stack as users select items
+                                popUpTo(Screen.Camera.route) {
+                                    saveState = true
                                 }
+                                // Avoid multiple copies of the same destination when
+                                // re-selecting the same item
+                                launchSingleTop = true
+                                // Restore state when re-selecting a previously selected item
+                                restoreState = true
                             }
                         }
-                    }) {
-                    Text(stringResource(R.string.submit))
-                }
+                    }
+                }) {
+                Text(stringResource(R.string.submit))
             }
         }
     }

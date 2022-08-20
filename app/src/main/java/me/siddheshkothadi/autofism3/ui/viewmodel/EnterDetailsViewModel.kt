@@ -61,9 +61,9 @@ class EnterDetailsViewModel @Inject constructor(
     }
 
     init {
-        _isLoading.value = true
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
         viewModelScope.launch {
+            _isLoading.value = true
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
             _timestamp.value = System.currentTimeMillis().toString()
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->

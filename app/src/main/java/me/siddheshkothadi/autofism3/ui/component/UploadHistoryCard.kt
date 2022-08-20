@@ -53,9 +53,8 @@ fun UploadHistoryCard(
             ) {
                 Column {
                     Text(fish.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 4.dp))
-                    Text(DateUtils.getDate(fish.timestamp), style = MaterialTheme.typography.bodySmall)
-                    Text(DateUtils.getTime(fish.timestamp), style = MaterialTheme.typography.bodySmall)
-//                    Text("${fish.quantity} kg", style = MaterialTheme.typography.bodySmall)
+                    Text(DateUtils.getDate(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
+                    Text(DateUtils.getTime(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
                 }
                 IconButton(onClick = {
                     val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
