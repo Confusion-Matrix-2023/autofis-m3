@@ -125,7 +125,7 @@ fun MainNavGraph(
                 EmptyScreen()
             }
             composable(Screen.Settings.route) {
-                SettingsScreen(navController)
+                SettingsScreen(navController, mainViewModel, recreateActivity)
             }
             composable(Screen.SelectLanguage.route) {
                 SelectLanguage(mainViewModel, recreateActivity)

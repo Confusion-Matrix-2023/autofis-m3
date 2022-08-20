@@ -22,4 +22,6 @@
     <string name="fetch">अपडेट करें</string>
     <string name="language">भाषा</string>
     <string name="chosen_language">चुनी हुई भाषा</string>
+    <string name="cancel">रद्द करे</string>
+    <string name="app_restart_note_after_language_selection">भाषा चुनने के बाद ऐप फिर से चालू हो जाएगा।</string>
 </resources>
