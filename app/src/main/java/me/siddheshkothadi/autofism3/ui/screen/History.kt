@@ -97,7 +97,9 @@ fun History(
                         style = MaterialTheme.typography.titleLarge,
                     )
                     if (isFetching) {
-                        CircularProgressIndicator(Modifier.size(20.dp))
+                        CircularProgressIndicator(
+                            Modifier.padding(vertical = 14.dp).size(20.dp)
+                        )
                     } else {
                         TextButton(onClick = { historyViewModel.fetchUploadHistory() }) {
                             Text(stringResource(R.string.fetch))

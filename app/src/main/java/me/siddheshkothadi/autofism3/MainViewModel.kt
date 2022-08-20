@@ -68,7 +68,7 @@ class MainViewModel @Inject constructor(
 
     fun onLanguageChosen(recreateActivity: () -> Unit) {
         setLanguage(selectedLanguage.value.locale)
-        checkLanguage()
+        isLanguageSelected.value = true
         recreateActivity()
     }
 

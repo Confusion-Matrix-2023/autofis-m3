@@ -35,12 +35,8 @@ fun SelectLanguage(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
-            .windowInsetsPadding(
-                WindowInsets.statusBars.only(
-                    WindowInsetsSides.Top
-                )
-            ),
+            .systemBarsPadding()
+            .padding(24.dp),
     ) {
         Text(
             stringResource(id = R.string.select_language),
