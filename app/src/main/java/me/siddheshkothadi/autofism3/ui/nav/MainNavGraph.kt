@@ -36,7 +36,7 @@ fun MainNavGraph(
 ) {
     val navController = rememberAnimatedNavController()
 
-    val isLanguageSelected by remember { mainViewModel.isLanguageSelected }
+    val startDestination by remember { mainViewModel.startDestination }
 
     val screens = listOf(
         Screen.Capture,
@@ -49,7 +49,7 @@ fun MainNavGraph(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if(isLanguageSelected) {
+            if(startDestination != Screen.SelectLanguage.route) {
                 NavigationBar(
                     modifier = Modifier.windowInsetsPadding(
                         WindowInsets.navigationBars.only(
@@ -111,7 +111,7 @@ fun MainNavGraph(
     ) { innerPadding ->
         AnimatedNavHost(
             navController = navController,
-            startDestination = if(isLanguageSelected) Screen.Capture.route else Screen.SelectLanguage.route ,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             captureGraph(navController, mainViewModel, context)

@@ -26,11 +26,11 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-    val isLanguageSelected: MutableState<Boolean> = mutableStateOf(false)
     val detector: MutableState<YoloV5Classifier?> = mutableStateOf(null)
     val isLoading = mutableStateOf(true)
 
     var selectedLanguage = mutableStateOf(Language.ENGLISH)
+    val startDestination = mutableStateOf(Screen.SelectLanguage.route)
 
     init {
         Timber.i("Init Block")
@@ -56,7 +56,7 @@ class MainViewModel @Inject constructor(
         val currentLanguage = sharedPref.getString(Constants.LANGUAGE_KEY, "")
         if (!currentLanguage.isNullOrBlank()) {
             // Language set
-            isLanguageSelected.value = true
+            startDestination.value = Screen.Capture.route
         }
     }
 
@@ -68,8 +68,8 @@ class MainViewModel @Inject constructor(
 
     fun onLanguageChosen(recreateActivity: () -> Unit) {
         setLanguage(selectedLanguage.value.locale)
-        isLanguageSelected.value = true
         recreateActivity()
+        startDestination.value = Screen.Capture.route
     }
 
     fun onLanguageSelected(language: Language, recreateActivity: () -> Unit) {
