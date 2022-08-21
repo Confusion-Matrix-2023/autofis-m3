@@ -1,5 +1,7 @@
 package me.siddheshkothadi.autofism3.ui.nav
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
@@ -13,7 +15,7 @@ import me.siddheshkothadi.autofism3.ui.screen.EnterDetails
 import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPermissionsApi::class)
-fun NavGraphBuilder.captureGraph(navController: NavHostController, mainViewModel: MainViewModel) {
+fun NavGraphBuilder.captureGraph(navController: NavHostController, mainViewModel: MainViewModel, activityContext: Activity) {
     navigation(startDestination = Screen.Camera.route, route = Screen.Capture.route) {
         composable(Screen.Camera.route) {
             CameraScreen(navController, mainViewModel)
@@ -24,7 +26,8 @@ fun NavGraphBuilder.captureGraph(navController: NavHostController, mainViewModel
                 EnterDetails(
                     navController,
                     enterDetailsViewModel,
-                    fishImageUri
+                    fishImageUri,
+                    activityContext
                 )
             }
         }

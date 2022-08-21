@@ -1,15 +1,23 @@
 package me.siddheshkothadi.autofism3.ui.viewmodel
 
 import android.annotation.SuppressLint
-import android.location.Location
+import android.app.Activity
+import android.content.Context
+import android.content.IntentSender.SendIntentException
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,6 +31,7 @@ import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.utils.awaitCurrentLocation
 import timber.log.Timber
 import javax.inject.Inject
+
 
 @ExperimentalPermissionsApi
 @SuppressLint("MissingPermission")
@@ -64,17 +73,55 @@ class EnterDetailsViewModel @Inject constructor(
             try {
                 withContext(Dispatchers.IO) {
                     _timestamp.value = System.currentTimeMillis().toString()
-                    val location = fusedLocationClient.awaitCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                    location?.let {
-                        _latitude.value = it.latitude.toString()
-                        _longitude.value = it.longitude.toString()
-                    }
-                    Timber.i("$latitude, $longitude")
+                    fetchLocation()
                 }
             } catch (e: Exception) {
                 Timber.e(e)
             }
+            _isLoading.value = false
         }
+    }
+
+    fun checkLocationAccess(activity: Activity) {
+        val locationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 10000
+        locationRequest.fastestInterval = (10000 / 2).toLong()
+
+        val locationSettingsRequestBuilder = LocationSettingsRequest.Builder()
+
+        locationSettingsRequestBuilder.addLocationRequest(locationRequest)
+        locationSettingsRequestBuilder.setAlwaysShow(true)
+
+        val settingsClient = LocationServices.getSettingsClient(activity)
+        val task: Task<LocationSettingsResponse> =
+            settingsClient.checkLocationSettings(locationSettingsRequestBuilder.build())
+
+        task.addOnSuccessListener {
+            Timber.i("Success $it")
+        }
+
+        task.addOnFailureListener {
+            try {
+                Timber.i("Failure")
+                val resolvableApiException = it as ResolvableApiException
+                resolvableApiException.startResolutionForResult(
+                    activity,
+                    0x1
+                )
+            } catch (sendIntentException: SendIntentException) {
+                sendIntentException.printStackTrace()
+            }
+        }
+    }
+
+    private suspend fun fetchLocation() {
+        val location = fusedLocationClient.awaitCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        location?.let {
+            _latitude.value = it.latitude.toString()
+            _longitude.value = it.longitude.toString()
+        }
+        Timber.i("$latitude, $longitude")
     }
 
     fun setQuantity(q: String) {

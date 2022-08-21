@@ -1,6 +1,8 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -40,7 +42,8 @@ import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
 fun EnterDetails(
     navController: NavHostController,
     enterDetailsViewModel: EnterDetailsViewModel,
-    fishImageUri: String
+    fishImageUri: String,
+    activityContext: Activity
 ) {
     val permissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -51,6 +54,7 @@ fun EnterDetails(
     )
 
     LaunchedEffect(permissionsState) {
+        enterDetailsViewModel.checkLocationAccess(activityContext)
         if (!permissionsState.allPermissionsGranted) {
             permissionsState.launchMultiplePermissionRequest()
         }

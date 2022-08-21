@@ -6,11 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +37,14 @@ fun History(
     val pendingUploads by historyViewModel.pendingUploads.collectAsState(initial = listOf())
     val uploadHistory by historyViewModel.uploadHistory.collectAsState(initial = listOf())
     val isFetching by remember { historyViewModel.isFetching }
+
+    LaunchedEffect(workState) {
+        if (workState?.any {
+                it.state == WorkInfo.State.SUCCEEDED
+            } == true) {
+            historyViewModel.fetchUploadHistory()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -98,7 +103,9 @@ fun History(
                     )
                     if (isFetching) {
                         CircularProgressIndicator(
-                            Modifier.padding(vertical = 14.dp).size(20.dp)
+                            Modifier
+                                .padding(vertical = 14.dp)
+                                .size(20.dp)
                         )
                     } else {
                         TextButton(onClick = { historyViewModel.fetchUploadHistory() }) {

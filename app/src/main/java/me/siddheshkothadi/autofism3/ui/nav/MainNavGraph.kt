@@ -1,5 +1,6 @@
 package me.siddheshkothadi.autofism3.ui.nav
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -29,7 +30,7 @@ import timber.log.Timber
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavGraph(
-    context: Context,
+    context: Activity,
     mainViewModel: MainViewModel,
     recreateActivity: () -> Unit
 ) {
@@ -113,7 +114,7 @@ fun MainNavGraph(
             startDestination = if(isLanguageSelected) Screen.Capture.route else Screen.SelectLanguage.route ,
             modifier = Modifier.padding(innerPadding)
         ) {
-            captureGraph(navController, mainViewModel)
+            captureGraph(navController, mainViewModel, context)
             composable(Screen.History.route) {
                 val historyViewModel: HistoryViewModel = hiltViewModel()
                 History(historyViewModel)
