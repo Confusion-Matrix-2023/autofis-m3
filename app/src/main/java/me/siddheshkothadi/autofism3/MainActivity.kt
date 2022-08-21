@@ -2,8 +2,10 @@ package me.siddheshkothadi.autofism3
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -36,7 +38,6 @@ class MainActivity : ComponentActivity() {
             }
         }
         super.onCreate(savedInstanceState)
-
         setContent {
             AutoFISM3Theme {
                 MainNavGraph(this, mainViewModel = mainViewModel) {

@@ -7,25 +7,21 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishApplication
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import me.siddheshkothadi.autofism3.utils.DateUtils
-import me.siddheshkothadi.autofism3.workmanager.UploadWorker
+import me.siddheshkothadi.autofism3.utils.awaitCurrentLocation
 import timber.log.Timber
-import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ExperimentalPermissionsApi
@@ -35,6 +31,8 @@ class EnterDetailsViewModel @Inject constructor(
     private val fishRepository: FishRepository,
     app: FishApplication,
 ) : ViewModel() {
+    private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
+
     private val _isLoading: MutableState<Boolean> = mutableStateOf(true)
     val isLoading: State<Boolean> = _isLoading
 
@@ -64,32 +62,17 @@ class EnterDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                viewModelScope.launch(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     _timestamp.value = System.currentTimeMillis().toString()
-                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
-                    fusedLocationClient.lastLocation
-                        .addOnSuccessListener { location: Location? ->
-                            // Got last known location. In some rare situations this can be null.
-                            _latitude.value = if(location?.latitude == null) {
-                                ""
-                            } else {
-                                location.latitude.toString()
-                            }
-                            _longitude.value = if(location?.longitude == null) {
-                                ""
-                            } else {
-                                location.longitude.toString()
-                            }
-                            Timber.i("$latitude, $longitude")
-                        }
-                        .addOnFailureListener { e ->
-                            Timber.e(e)
-                        }
+                    val location = fusedLocationClient.awaitCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    location?.let {
+                        _latitude.value = it.latitude.toString()
+                        _longitude.value = it.longitude.toString()
+                    }
+                    Timber.i("$latitude, $longitude")
                 }
             } catch (e: Exception) {
                 Timber.e(e)
-            } finally {
-                _isLoading.value = false
             }
         }
     }

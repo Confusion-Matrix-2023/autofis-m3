@@ -1,5 +1,6 @@
 package me.siddheshkothadi.autofism3.ui.screen
 
+import android.Manifest
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -27,6 +28,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.launch
 import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.ui.component.MapView
@@ -40,6 +42,20 @@ fun EnterDetails(
     enterDetailsViewModel: EnterDetailsViewModel,
     fishImageUri: String
 ) {
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+        )
+    )
+
+    LaunchedEffect(permissionsState) {
+        if (!permissionsState.allPermissionsGranted) {
+            permissionsState.launchMultiplePermissionRequest()
+        }
+    }
+
     val isLoading by remember { enterDetailsViewModel.isLoading }
     val quantity by remember { enterDetailsViewModel.quantity }
     val latitude by remember { enterDetailsViewModel.latitude }
@@ -136,7 +152,12 @@ fun EnterDetails(
                         .clip(RoundedCornerShape(12.dp))
                 )
             } else {
-                CircularProgressIndicator(Modifier.size(20.dp))
+                if(isLoading) {
+                    CircularProgressIndicator(Modifier.size(20.dp))
+                }
+                else {
+                    Text(stringResource(id = R.string.location_not_found))
+                }
             }
 
             Button(
