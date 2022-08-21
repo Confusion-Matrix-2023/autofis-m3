@@ -222,6 +222,7 @@ fun CameraScreen(
                                                 isLoading = true
                                                 dialogText = context.getString(R.string.recognizing_fish_in_image)
                                                 withContext(Dispatchers.IO) {
+                                                    mainViewModel.setBitmap(bitmap!!)
                                                     val results: List<Classifier.Recognition> =
                                                         detector!!.recognizeImage(
                                                             bitmap
@@ -250,6 +251,11 @@ fun CameraScreen(
                                                         }
                                                         ""
                                                     } else {
+                                                        // Saving bounding box coordinates to data store
+                                                        dialogText = context.getString(R.string.drawing_bounding_boxes)
+
+                                                        mainViewModel.saveBoundingBoxes(mappedRecognitions)
+                                                        
                                                         // File saving part
                                                         dialogText = context.getString(R.string.saving_image)
                                                         val bmp = imageProxy.getBitmap()

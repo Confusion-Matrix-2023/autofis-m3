@@ -4,6 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.IntentSender.SendIntentException
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.RectF
+import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +29,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishApplication
+import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import me.siddheshkothadi.autofism3.utils.DateUtils
@@ -38,7 +43,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EnterDetailsViewModel @Inject constructor(
     private val fishRepository: FishRepository,
-    app: FishApplication,
+    private val app: FishApplication,
 ) : ViewModel() {
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(app)
 
@@ -66,6 +71,9 @@ class EnterDetailsViewModel @Inject constructor(
     val timeString = _timestamp.mapLatest { timestampString ->
         DateUtils.getTime(app, timestampString)
     }
+
+    val boundingBoxes: Flow<List<RectF>> = fishRepository.boundingBoxes
+    val bitmapInfo: Flow<BitmapInfo> = fishRepository.bitmapInfo
 
     init {
         viewModelScope.launch {

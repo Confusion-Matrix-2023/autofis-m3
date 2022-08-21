@@ -2,6 +2,7 @@ package me.siddheshkothadi.autofism3
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.preference.PreferenceManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +12,9 @@ import androidx.navigation.NavHostController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.siddheshkothadi.autofism3.datastore.LocalDataStore
+import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import me.siddheshkothadi.autofism3.detection.tflite.DetectorFactory
 import me.siddheshkothadi.autofism3.detection.tflite.YoloV5Classifier
 import me.siddheshkothadi.autofism3.ui.Language
@@ -22,7 +26,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    app: FishApplication
+    app: FishApplication,
+    private val localDataStore: LocalDataStore
 ) : ViewModel() {
 
     private val sharedPref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
@@ -75,6 +80,18 @@ class MainViewModel @Inject constructor(
     fun onLanguageSelected(language: Language, recreateActivity: () -> Unit) {
         setLanguage(language.locale)
         recreateActivity()
+    }
+
+    suspend fun setBitmap(b: Bitmap) {
+        withContext(Dispatchers.IO) {
+            localDataStore.setBitmap(b)
+        }
+    }
+
+    suspend fun saveBoundingBoxes(listOfLocation: List<Classifier.Recognition>) {
+        withContext(Dispatchers.IO) {
+            localDataStore.setRecognitions(listOfLocation)
+        }
     }
 
     private fun setLanguage(language: String) {

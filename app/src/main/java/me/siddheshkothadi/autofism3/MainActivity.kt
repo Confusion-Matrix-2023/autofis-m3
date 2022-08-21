@@ -2,10 +2,8 @@ package me.siddheshkothadi.autofism3
 
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -13,7 +11,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
-import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.ui.nav.MainNavGraph
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
 import me.siddheshkothadi.autofism3.utils.setAppLocale
@@ -23,9 +20,6 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
-
-    @Inject
-    lateinit var localDataStore: LocalDataStore
 
     @OptIn(
         ExperimentalPermissionsApi::class

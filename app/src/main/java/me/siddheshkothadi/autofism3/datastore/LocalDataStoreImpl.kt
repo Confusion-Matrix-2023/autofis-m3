@@ -1,19 +1,18 @@
 package me.siddheshkothadi.autofism3.datastore
 
 import android.content.Context
-import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.os.Build
 import android.provider.Settings
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.dataStore
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import me.siddheshkothadi.autofism3.Constants
 import me.siddheshkothadi.autofism3.FishApplication
+import me.siddheshkothadi.autofism3.detection.tflite.Classifier
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -22,21 +21,105 @@ import kotlin.math.roundToInt
 class LocalDataStoreImpl @Inject constructor(
     private val context: FishApplication
 ) : LocalDataStore {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "device_data")
-    private val deviceDataStore = context.dataStore
-    private val deviceData: Flow<Preferences>
-        get() = deviceDataStore.data
+    private val Context.localDataStore: DataStore<LocalData> by dataStore(
+        fileName = "local_data.pb",
+        serializer = LocalDataSerializer
+    )
+    private val localDataStore = context.localDataStore
+
+    override val localData: Flow<LocalData>
+        get() = localDataStore.data
 
     override val deviceId: Flow<String>
-        get() = deviceData.map { preferences ->
-            preferences[DEVICE_ID_KEY] ?: ""
+        get() = localData.map {
+            it.deviceId
         }
 
     override val bearerToken: Flow<String>
-        get() = deviceData.map { preferences ->
-            preferences[BEARER_TOKEN_KEY] ?: ""
+        get() = localData.map {
+            it.bearerToken
         }
 
+    override val recognitions: Flow<Recognitions>
+        get() = localData.map {
+            it.recognitions
+        }
+
+    private fun getPersistentDeviceId(): String =
+        Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
+
+    private fun generateJWT(generatedDeviceId: String): String {
+        return Jwts.builder()
+            .claim("device_id", generatedDeviceId)
+            .signWith(SignatureAlgorithm.HS256, Constants.JWT_SECRET.toByteArray())
+            .compact()
+    }
+
+    private suspend fun setDeviceId(generatedDeviceId: String) {
+        localDataStore.updateData { currentLocalData ->
+            currentLocalData.toBuilder()
+                .setDeviceId(generatedDeviceId)
+                .build()
+        }
+    }
+
+    private suspend fun setBearerToken(bearerToken: String) {
+        localDataStore.updateData { currentLocalData ->
+            currentLocalData.toBuilder()
+                .setBearerToken(bearerToken)
+                .build()
+        }
+    }
+
+    override suspend fun setDeviceIdAndBearerToken() {
+        val generatedDeviceId = getPersistentDeviceId()
+        val jwt = generateJWT(generatedDeviceId)
+        val generatedBearerToken = "Bearer $jwt"
+        Timber.i(generatedBearerToken)
+        setDeviceId(generatedDeviceId)
+        setBearerToken(generatedBearerToken)
+    }
+
+    override val bitmapInfo: Flow<BitmapInfo>
+        get() = localData.map {
+            it.bitmapInfo
+        }
+
+    override suspend fun setBitmap(bitmap: Bitmap) {
+        val bmpInfo = BitmapInfo.newBuilder()
+            .setBitmapHeight(bitmap.height)
+            .setBitmapWidth(bitmap.width)
+        localDataStore.updateData { currentLocalData ->
+            currentLocalData.toBuilder()
+                .setBitmapInfo(bmpInfo)
+                .build()
+        }
+    }
+
+    override suspend fun setRecognitions(list: List<Classifier.Recognition>) {
+        val boundingBoxes = list.map {
+            it.location
+        }.map {
+            BoundingBox.newBuilder()
+                .setLeft(it.left)
+                .setRight(it.right)
+                .setTop(it.top)
+                .setBottom(it.bottom)
+                .build()
+        }
+
+        val locations = Recognitions.newBuilder()
+            .addAllLocation(boundingBoxes)
+            .build()
+
+        localDataStore.updateData { currentLocalData ->
+            currentLocalData.toBuilder()
+                .setRecognitions(locations)
+                .build()
+        }
+    }
+
+    // Unused
     private fun getRandomString(): String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
         var string = ""
@@ -63,42 +146,5 @@ class LocalDataStoreImpl @Inject constructor(
         val uniqueID = UUID.randomUUID().toString()
 
         return "$deviceName-$randomString-$timestamp-$uniqueID"
-    }
-
-    private fun getPersistentDeviceId(): String =
-        Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
-
-    private fun generateJWT(generatedDeviceId: String): String {
-        return Jwts.builder()
-            .claim("device_id", generatedDeviceId)
-            .signWith(SignatureAlgorithm.HS256, JWT_SECRET.toByteArray())
-            .compact()
-    }
-
-    private suspend fun setDeviceId(generatedDeviceId: String) {
-        deviceDataStore.edit { mutablePreferences ->
-            mutablePreferences[DEVICE_ID_KEY] = generatedDeviceId
-        }
-    }
-
-    private suspend fun setBearerToken(bearerToken: String) {
-        deviceDataStore.edit { mutablePreferences ->
-            mutablePreferences[BEARER_TOKEN_KEY] = bearerToken
-        }
-    }
-
-    override suspend fun setDeviceIdAndBearerToken() {
-        val generatedDeviceId = getPersistentDeviceId()
-        val jwt = generateJWT(generatedDeviceId)
-        val generatedBearerToken = "Bearer $jwt"
-        Timber.i(generatedBearerToken)
-        setDeviceId(generatedDeviceId)
-        setBearerToken(generatedBearerToken)
-    }
-
-    companion object {
-        val DEVICE_ID_KEY = stringPreferencesKey("device_id")
-        val BEARER_TOKEN_KEY = stringPreferencesKey("bearer_token")
-        const val JWT_SECRET = "f00t4f30321@@0439!2#@am"
     }
 }

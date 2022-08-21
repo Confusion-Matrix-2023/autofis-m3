@@ -2,6 +2,7 @@ package me.siddheshkothadi.autofism3.repository
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.RectF
 import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.flow.Flow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import me.siddheshkothadi.autofism3.FishApplication
 import me.siddheshkothadi.autofism3.database.*
+import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
@@ -31,6 +33,20 @@ class FishRepositoryImpl(
     private val context: FishApplication
 ) : FishRepository {
     private val workManager = WorkManager.getInstance(context)
+
+    override val boundingBoxes: Flow<List<RectF>>
+        get() = localDataStore.recognitions.map { recognitions ->
+            recognitions.locationList.map { boundingBox ->
+                RectF(
+                    boundingBox.left,
+                    boundingBox.top,
+                    boundingBox.right,
+                    boundingBox.bottom
+                )
+            }
+        }
+    override val bitmapInfo: Flow<BitmapInfo>
+        get() = localDataStore.bitmapInfo
 
     @OptIn(ExperimentalPermissionsApi::class)
     private fun generateWorkRequest(

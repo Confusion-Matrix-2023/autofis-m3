@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ऑटोफिस</string>
+    <string name="fish">मछली</string>
     <string name="history">इतिहास</string>
     <string name="learn">सीखना</string>
     <string name="capture">फोटो खिचो</string>
@@ -25,4 +26,5 @@
     <string name="cancel">रद्द करे</string>
     <string name="app_restart_note_after_language_selection">भाषा चुनने के बाद ऐप फिर से चालू हो जाएगा।</string>
     <string name="location_not_found">स्थान नहीं मिला!</string>
+    <string name="drawing_bounding_boxes">बाउंडिंग बॉक्स खींचे जा रहे हैं</string>
 </resources>

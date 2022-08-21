@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option java_package = "me.siddheshkothadi.autofism3.datastore";
+option java_multiple_files = true;
+
+message BoundingBox {
+  float left = 1;
+  float right = 2;
+  float top = 3;
+  float bottom = 4;
+  float confidence = 5;
+}
+
+message BitmapInfo {
+  int32 bitmapHeight = 1;
+  int32 bitmapWidth = 2;
+}
+
+message Recognitions {
+  repeated BoundingBox location = 1;
+}
+
+message LocalData {
+  string deviceId = 1;
+  string bearerToken = 2;
+  BitmapInfo bitmapInfo = 3;
+  Recognitions recognitions = 4;
+}

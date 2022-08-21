@@ -8,13 +8,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.siddheshkothadi.autofism3.FishApplication
-import me.siddheshkothadi.autofism3.datastore.LocalDataStoreImpl
 import me.siddheshkothadi.autofism3.database.PendingUploadFishDatabase
 import me.siddheshkothadi.autofism3.database.UploadHistoryFishDatabase
-import me.siddheshkothadi.autofism3.repository.FishRepositoryImpl
-import me.siddheshkothadi.autofism3.network.FileAPI
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
+import me.siddheshkothadi.autofism3.datastore.LocalDataStoreImpl
+import me.siddheshkothadi.autofism3.network.FileAPI
 import me.siddheshkothadi.autofism3.repository.FishRepository
+import me.siddheshkothadi.autofism3.repository.FishRepositoryImpl
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
