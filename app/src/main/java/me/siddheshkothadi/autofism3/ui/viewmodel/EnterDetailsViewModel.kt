@@ -7,10 +7,11 @@ import android.content.IntentSender.SendIntentException
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
-import android.net.Uri
+import android.net.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -62,6 +63,8 @@ class EnterDetailsViewModel @Inject constructor(
     private val _timestamp = MutableStateFlow<String>("")
     private val timestamp: StateFlow<String> = _timestamp
 
+    val isConnectedToNetwork = mutableStateOf(false)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val dateString = _timestamp.mapLatest { timestampString ->
         DateUtils.getDate(app, timestampString)
@@ -75,6 +78,26 @@ class EnterDetailsViewModel @Inject constructor(
     val boundingBoxes: Flow<List<RectF>> = fishRepository.boundingBoxes
     val bitmapInfo: Flow<BitmapInfo> = fishRepository.bitmapInfo
 
+    private val networkRequest = NetworkRequest.Builder()
+        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+        .build()
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        // network is available for use
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            isConnectedToNetwork.value = true
+        }
+
+        // lost network connection
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            isConnectedToNetwork.value = false
+        }
+    }
+
     init {
         viewModelScope.launch {
             _isLoading.value = true
@@ -82,6 +105,8 @@ class EnterDetailsViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     _timestamp.value = System.currentTimeMillis().toString()
                     fetchLocation()
+                    val connectivityManager = getSystemService(app, ConnectivityManager::class.java) as ConnectivityManager
+                    connectivityManager.requestNetwork(networkRequest, networkCallback)
                 }
             } catch (e: Exception) {
                 Timber.e(e)

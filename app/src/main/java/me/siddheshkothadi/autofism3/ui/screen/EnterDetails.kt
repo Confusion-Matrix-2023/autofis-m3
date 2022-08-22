@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -76,6 +77,7 @@ fun EnterDetails(
     val longitude by remember { enterDetailsViewModel.longitude }
     val date by enterDetailsViewModel.dateString.collectAsState(initial = "Loading...")
     val time by enterDetailsViewModel.timeString.collectAsState(initial = "Loading...")
+    val isConnectedToNetwork by remember { enterDetailsViewModel.isConnectedToNetwork }
 
     var quantityError by remember { mutableStateOf(false) }
 
@@ -259,6 +261,10 @@ fun EnterDetails(
             )
 
             if (latitude.isNotBlank() && longitude.isNotBlank()) {
+                if(!isConnectedToNetwork) {
+                    Text(stringResource(R.string.map_view_may_not_render_properly), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(12.dp))
+                }
                 MapView(
                     latitude, longitude,
                     Modifier
@@ -269,7 +275,7 @@ fun EnterDetails(
                 if (isLoading) {
                     CircularProgressIndicator(Modifier.size(20.dp))
                 } else {
-                    Text(stringResource(id = R.string.location_not_found))
+                    Text(stringResource(id = R.string.location_not_found), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
                 }
             }
 

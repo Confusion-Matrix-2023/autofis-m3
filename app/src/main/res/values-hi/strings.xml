@@ -28,4 +28,5 @@
     <string name="location_not_found">स्थान नहीं मिला!</string>
     <string name="drawing_bounding_boxes">बाउंडिंग बॉक्स खींचे जा रहे हैं</string>
     <string name="uploading_fish_data">मछली डेटा अपलोड किया जा रहा है</string>
+    <string name="map_view_may_not_render_properly">स्थान लिया गया है लेकिन कम इंटरनेट कनेक्टिविटी के कारण नक्शा ठीक से प्रस्तुत नहीं हो सकता है!</string>
 </resources>

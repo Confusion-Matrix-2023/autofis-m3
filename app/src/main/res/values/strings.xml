@@ -27,4 +27,5 @@
     <string name="location_not_found">Location not found!</string>
     <string name="drawing_bounding_boxes">Drawing bounding boxes</string>
     <string name="uploading_fish_data">Uploading Fish Data</string>
+    <string name="map_view_may_not_render_properly">MapView may not render properly because of low internet connectivity!</string>
 </resources>
