@@ -27,4 +27,5 @@
     <string name="app_restart_note_after_language_selection">भाषा चुनने के बाद ऐप रीस्टार्ट हो सकता है।</string>
     <string name="location_not_found">स्थान नहीं मिला!</string>
     <string name="drawing_bounding_boxes">बाउंडिंग बॉक्स खींचे जा रहे हैं</string>
+    <string name="uploading_fish_data">मछली डेटा अपलोड किया जा रहा है</string>
 </resources>

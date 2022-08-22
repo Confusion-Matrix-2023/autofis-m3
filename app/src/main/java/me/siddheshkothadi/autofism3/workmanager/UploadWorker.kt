@@ -52,7 +52,7 @@ class UploadWorker @AssistedInject constructor(
                     .setOnlyAlertOnce(true)
                     .setSmallIcon(R.drawable.ic_baseline_cloud_upload_24)
                     .setLargeIcon(image)
-                    .setContentTitle("Uploading Fish Data")
+                    .setContentTitle(context.getString(R.string.uploading_fish_data))
                     .setProgress(100, progress, false)
                     .build()
             )

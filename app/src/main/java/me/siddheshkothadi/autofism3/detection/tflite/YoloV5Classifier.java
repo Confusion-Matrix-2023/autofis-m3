@@ -93,9 +93,9 @@ public class YoloV5Classifier implements Classifier {
             if(compatList.isDelegateSupportedOnThisDevice()){
                 // if the device has a supported GPU, add the GPU delegate
                 options.setNumThreads(NUM_THREADS);
-                GpuDelegate.Options delegateOptions = compatList.getBestOptionsForThisDevice();
-                GpuDelegate gpuDelegate = new GpuDelegate(delegateOptions);
-                options.addDelegate(gpuDelegate);
+//                GpuDelegate.Options delegateOptions = compatList.getBestOptionsForThisDevice();
+//                GpuDelegate gpuDelegate = new GpuDelegate(delegateOptions);
+//                options.addDelegate(gpuDelegate);
             } else {
                 // if the GPU is not supported, run on 4 threads
                 options.setNumThreads(4);
@@ -239,7 +239,7 @@ public class YoloV5Classifier implements Classifier {
     private static final int NUM_BOXES_PER_BLOCK = 3;
 
     // Number of threads in the java app
-    private static final int NUM_THREADS = 1;
+    private static final int NUM_THREADS = 4;
     private static boolean isNNAPI = false;
     private static boolean isGPU = false;
 

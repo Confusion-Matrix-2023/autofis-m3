@@ -19,7 +19,7 @@
     <string name="saving_image">फोटो सेव्ह केला जात आहे</string>
     <string name="loading">लोड केला जात आहे</string>
     <string name="pending_uploads">प्रलंबित अपलोड</string>
-    <string name="upload_history">पमागील अपलोड</string>
+    <string name="upload_history">मागील अपलोड</string>
     <string name="fetch">अपडेट करा</string>
     <string name="language">भाषा</string>
     <string name="chosen_language">निवडलेली भाषा</string>
@@ -27,4 +27,5 @@
     <string name="app_restart_note_after_language_selection">भाषा निवडल्यानंतर अॅप रीस्टार्ट होऊ शकतो.</string>
     <string name="location_not_found">स्थान सापडले नाही!</string>
     <string name="drawing_bounding_boxes">बाउंडिंग बॉक्स काढले जात आहेत</string>
+    <string name="uploading_fish_data">फिश डेटा अपलोड केला जात आहे</string>
 </resources>

@@ -36,6 +36,16 @@ public class DetectorFactory {
                     10,13, 16,30, 33,23, 30,61, 62,45, 59,119, 116,90, 156,198, 373,326
             };
         }
+        else if (modelFilename.equals("yolov5s_FinalData.tflite")) {
+            labelFilename = "file:///android_asset/fish.txt";
+            isQuantized = false;
+            inputSize = 640;
+            output_width = new int[]{40, 20, 10};
+            masks = new int[][]{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
+            anchors = new int[]{
+                    10,13, 16,30, 33,23, 30,61, 62,45, 59,119, 116,90, 156,198, 373,326
+            };
+        }
         else if (modelFilename.equals("yolov5s-int8.tflite")) {
             labelFilename = "file:///android_asset/coco.txt";
             isQuantized = true;

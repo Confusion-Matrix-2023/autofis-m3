@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -410,28 +411,52 @@ fun CameraScreen(
             }
 
             if (isLoading) {
-                Dialog(onDismissRequest = { /*TODO*/ }) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .align(Alignment.Center)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(36.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            dialogText,
-                            style = MaterialTheme.typography.labelLarge,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
+//                Dialog(onDismissRequest = { /*TODO*/ }) {
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxWidth(0.8f)
+//                            .align(Alignment.Center)
+//                            .clip(RoundedCornerShape(12.dp))
+//                            .background(MaterialTheme.colorScheme.surface)
+//                            .padding(36.dp),
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                    ) {
+//                        CircularProgressIndicator(
+//                            modifier = Modifier.size(20.dp)
+//                        )
+//                        Spacer(Modifier.height(12.dp))
+//                        Text(
+//                            dialogText,
+//                            style = MaterialTheme.typography.labelLarge,
+//                            maxLines = 3,
+//                            overflow = TextOverflow.Ellipsis,
+//                            textAlign = TextAlign.Center
+//                        )
+//                    }
+//                }
+                AlertDialog(
+                    title = {},
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                dialogText,
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    },
+                    confirmButton = {},
+                    onDismissRequest = { /*TODO*/ }
+                )
             }
         }
     }

@@ -26,4 +26,5 @@
     <string name="app_restart_note_after_language_selection">The app may restart after selecting the language.</string>
     <string name="location_not_found">Location not found!</string>
     <string name="drawing_bounding_boxes">Drawing bounding boxes</string>
+    <string name="uploading_fish_data">Uploading Fish Data</string>
 </resources>
