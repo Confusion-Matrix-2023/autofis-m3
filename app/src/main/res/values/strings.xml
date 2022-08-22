@@ -23,7 +23,7 @@
     <string name="language">Language</string>
     <string name="chosen_language">Chosen Language</string>
     <string name="cancel">Cancel</string>
-    <string name="app_restart_note_after_language_selection">The app will restart after selecting the language.</string>
+    <string name="app_restart_note_after_language_selection">The app may restart after selecting the language.</string>
     <string name="location_not_found">Location not found!</string>
     <string name="drawing_bounding_boxes">Drawing bounding boxes</string>
 </resources>
