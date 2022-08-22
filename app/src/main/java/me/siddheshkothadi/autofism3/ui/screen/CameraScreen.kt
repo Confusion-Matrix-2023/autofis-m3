@@ -2,6 +2,7 @@ package me.siddheshkothadi.autofism3.ui.screen
 
 import android.Manifest
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -34,15 +35,12 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.siddheshkothadi.autofism3.FishAnalyzer
+import me.siddheshkothadi.autofism3.Constants
 import me.siddheshkothadi.autofism3.MainViewModel
 import me.siddheshkothadi.autofism3.R
-import me.siddheshkothadi.autofism3.Constants
+import me.siddheshkothadi.autofism3.detection.env.ImageUtils
 import me.siddheshkothadi.autofism3.detection.tflite.Classifier
-import me.siddheshkothadi.autofism3.utils.DateUtils
-import me.siddheshkothadi.autofism3.utils.getBitmap
-import me.siddheshkothadi.autofism3.utils.getUri
-import me.siddheshkothadi.autofism3.utils.storeBitmap
+import me.siddheshkothadi.autofism3.utils.*
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
@@ -90,14 +88,6 @@ fun CameraScreen(
         mutableStateOf(null)
     }
 
-    val fishAnalyzer = remember {
-        detector?.let {
-            FishAnalyzer(coroutineScope, it) { bmp ->
-                bitmap = bmp
-            }
-        }
-    }
-
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -139,10 +129,102 @@ fun CameraScreen(
                                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                                 .build()
                                 .apply {
-                                    if (fishAnalyzer != null) {
+                                    detector?.let {
                                         setAnalyzer(
                                             executor,
-                                            fishAnalyzer
+                                            object : ImageAnalysis.Analyzer {
+                                                @androidx.camera.core.ExperimentalGetImage
+                                                override fun analyze(imageProxy: ImageProxy) {
+                                                    val image = imageProxy.image
+
+                                                    if (image == null || isLoading) {
+                                                        Timber.i("Closing")
+                                                        imageProxy.close()
+                                                        return
+                                                    }
+                                                    coroutineScope.launch(Dispatchers.IO) {
+                                                        val previewHeight = image.height
+                                                        val previewWidth = image.width
+
+                                                        val cropSize = it.inputSize
+                                                        val sensorOrientation =
+                                                            imageProxy.imageInfo.rotationDegrees
+
+                                                        // Matrix to convert frame from 4_3 aspect ratio to cropped size and rotate
+                                                        val frameToCropTransform =
+                                                            ImageUtils.getTransformationMatrix(
+                                                                previewWidth,
+                                                                previewHeight,
+                                                                cropSize,
+                                                                cropSize,
+                                                                sensorOrientation,
+                                                                true
+                                                            )
+
+                                                        // yuv stores the og image info (4_3)
+                                                        val yuvBytes =
+                                                            arrayOfNulls<ByteArray>(3)
+                                                        val planes = image.planes
+                                                        fillBytes(planes, yuvBytes)
+                                                        val yRowStride = planes[0].rowStride
+                                                        val uvRowStride =
+                                                            planes[1].rowStride
+                                                        val uvPixelStride =
+                                                            planes[1].pixelStride
+
+                                                        // rgbBytes is 1d array that stores rgb values after converting yuv to rgb
+                                                        val rgbBytes =
+                                                            IntArray(previewWidth * previewHeight)
+
+                                                        ImageUtils.convertYUV420ToARGB8888(
+                                                            yuvBytes[0],
+                                                            yuvBytes[1],
+                                                            yuvBytes[2],
+                                                            previewWidth,
+                                                            previewHeight,
+                                                            yRowStride,
+                                                            uvRowStride,
+                                                            uvPixelStride,
+                                                            rgbBytes
+                                                        )
+
+                                                        // We set rgbBytes values in rgbFrameBitmap
+                                                        val rgbFrameBitmap =
+                                                            Bitmap.createBitmap(
+                                                                previewWidth,
+                                                                previewHeight,
+                                                                Bitmap.Config.ARGB_8888
+                                                            )
+                                                        rgbFrameBitmap.setPixels(
+                                                            rgbBytes,
+                                                            0,
+                                                            previewWidth,
+                                                            0,
+                                                            0,
+                                                            previewWidth,
+                                                            previewHeight
+                                                        )
+
+                                                        // Save cropped and transformed (rotated) image in croppedBitmap
+                                                        val croppedBitmap =
+                                                            Bitmap.createBitmap(
+                                                                cropSize,
+                                                                cropSize,
+                                                                Bitmap.Config.ARGB_8888
+                                                            )
+                                                        val canvas = Canvas(croppedBitmap)
+                                                        canvas.drawBitmap(
+                                                            rgbFrameBitmap,
+                                                            frameToCropTransform,
+                                                            null
+                                                        )
+
+                                                        bitmap = croppedBitmap
+                                                        imageProxy.close()
+                                                    }
+
+                                                }
+                                            }
                                         )
                                     }
                                 }
@@ -220,7 +302,8 @@ fun CameraScreen(
                                         coroutineScope.launch {
                                             try {
                                                 isLoading = true
-                                                dialogText = context.getString(R.string.recognizing_fish_in_image)
+                                                dialogText =
+                                                    context.getString(R.string.recognizing_fish_in_image)
                                                 withContext(Dispatchers.IO) {
                                                     mainViewModel.setBitmap(bitmap!!)
                                                     val results: List<Classifier.Recognition> =
@@ -247,19 +330,28 @@ fun CameraScreen(
 
                                                     imageUri = if (mappedRecognitions.isEmpty()) {
                                                         withContext(Dispatchers.Main) {
-                                                            Toast.makeText(context, context.getString(R.string.fish_not_detected_please_try_again), Toast.LENGTH_LONG).show()
+                                                            Toast.makeText(
+                                                                context,
+                                                                context.getString(R.string.fish_not_detected_please_try_again),
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
                                                         }
                                                         ""
                                                     } else {
                                                         // Saving bounding box coordinates to data store
-                                                        dialogText = context.getString(R.string.drawing_bounding_boxes)
+                                                        dialogText =
+                                                            context.getString(R.string.drawing_bounding_boxes)
 
-                                                        mainViewModel.saveBoundingBoxes(mappedRecognitions)
-                                                        
+                                                        mainViewModel.saveBoundingBoxes(
+                                                            mappedRecognitions
+                                                        )
+
                                                         // File saving part
-                                                        dialogText = context.getString(R.string.saving_image)
+                                                        dialogText =
+                                                            context.getString(R.string.saving_image)
                                                         val bmp = imageProxy.getBitmap()
-                                                        val minDimension = min(bmp.width, bmp.height)
+                                                        val minDimension =
+                                                            min(bmp.width, bmp.height)
                                                         val croppedBmp = if (bmp.height > bmp.width)
                                                             Bitmap.createBitmap(
                                                                 bmp,
@@ -270,7 +362,7 @@ fun CameraScreen(
                                                             ) else
                                                             Bitmap.createBitmap(
                                                                 bmp,
-                                                                (bmp.width - minDimension)/2,
+                                                                (bmp.width - minDimension) / 2,
                                                                 0,
                                                                 minDimension,
                                                                 minDimension
@@ -332,7 +424,12 @@ fun CameraScreen(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(Modifier.height(12.dp))
-                        Text(dialogText, style = MaterialTheme.typography.labelLarge, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            dialogText,
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
