@@ -14,11 +14,13 @@ import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
+import me.siddheshkothadi.autofism3.network.AWSFileAPI
 import me.siddheshkothadi.autofism3.network.FileAPI
 import me.siddheshkothadi.autofism3.network.UploadStreamRequestBody
 import me.siddheshkothadi.autofism3.workmanager.UploadWorker
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -30,6 +32,7 @@ class FishRepositoryImpl(
     private val uploadHistoryFishDAO: UploadHistoryFishDAO,
     private val localDataStore: LocalDataStore,
     private val fileAPI: FileAPI,
+    private val awsFileAPI: AWSFileAPI,
     private val context: FishApplication
 ) : FishRepository {
     private val workManager = WorkManager.getInstance(context)
@@ -78,8 +81,31 @@ class FishRepositoryImpl(
     private suspend fun getBearerToken(): String {
         val bearerToken = localDataStore.bearerToken.first()
         if (bearerToken.isNotBlank()) return bearerToken
-        localDataStore.setDeviceIdAndBearerToken()
-        return localDataStore.bearerToken.first()
+        localDataStore.setDeviceKeyNameAndBearerToken()
+        val newBearerToken = localDataStore.bearerToken.first()
+        try {
+            val response = awsFileAPI.checkDevice(newBearerToken)
+            Timber.i(response.toString())
+            localDataStore.apply {
+                setDeviceKey(response.deviceKey)
+                setDeviceName(response.deviceName)
+                setId(response.id)
+            }
+            Timber.i("Success $newBearerToken")
+        } catch (e: HttpException) {
+            val dName = localDataStore.deviceName.first()
+            val dKey = localDataStore.deviceKey.first()
+            val response = awsFileAPI.addNewDevice(dName, dKey)
+            Timber.i(response.toString())
+            localDataStore.apply {
+                setDeviceKey(response.deviceKey)
+                setDeviceName(response.deviceName)
+                setId(response.id)
+            }
+            Timber.i("Failure $newBearerToken")
+        }
+
+        return newBearerToken
     }
 
     override suspend fun enqueueUpload(fish: PendingUploadFish) {

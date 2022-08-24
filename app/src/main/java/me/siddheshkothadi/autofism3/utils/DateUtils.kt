@@ -49,4 +49,9 @@ object DateUtils {
         val simpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
         return simpleDateFormat.format(timestamp)
     }
+
+    fun getSubmissionTimeStamp(timestamp: Long): String {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.ENGLISH)
+        return simpleDateFormat.format(timestamp)
+    }
 }

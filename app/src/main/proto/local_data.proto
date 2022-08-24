@@ -21,8 +21,10 @@ message Recognitions {
 }
 
 message LocalData {
-  string deviceId = 1;
-  string bearerToken = 2;
-  BitmapInfo bitmapInfo = 3;
-  Recognitions recognitions = 4;
+  string id = 1;
+  string deviceName = 2;
+  string deviceKey = 3;
+  string bearerToken = 4;
+  BitmapInfo bitmapInfo = 5;
+  Recognitions recognitions = 6;
 }

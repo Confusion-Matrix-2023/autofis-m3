@@ -26,13 +26,22 @@ class LocalDataStoreImpl @Inject constructor(
         serializer = LocalDataSerializer
     )
     private val localDataStore = context.localDataStore
-
     override val localData: Flow<LocalData>
         get() = localDataStore.data
 
-    override val deviceId: Flow<String>
+    override val id: Flow<String>
         get() = localData.map {
-            it.deviceId
+            it.id
+        }
+
+    override val deviceName: Flow<String>
+        get() = localData.map {
+            it.deviceName
+        }
+
+    override val deviceKey: Flow<String>
+        get() = localData.map {
+            it.deviceKey
         }
 
     override val bearerToken: Flow<String>
@@ -45,25 +54,33 @@ class LocalDataStoreImpl @Inject constructor(
             it.recognitions
         }
 
-    private fun getPersistentDeviceId(): String =
+    private fun getPersistentDeviceKey(): String =
         Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
 
-    private fun generateJWT(generatedDeviceId: String): String {
+    override fun generateJWT(generatedDeviceId: String): String {
         return Jwts.builder()
             .claim("device_id", generatedDeviceId)
             .signWith(SignatureAlgorithm.HS256, Constants.JWT_SECRET.toByteArray())
             .compact()
     }
 
-    private suspend fun setDeviceId(generatedDeviceId: String) {
+    override suspend fun setDeviceKey(generatedDeviceId: String) {
         localDataStore.updateData { currentLocalData ->
             currentLocalData.toBuilder()
-                .setDeviceId(generatedDeviceId)
+                .setDeviceKey(generatedDeviceId)
                 .build()
         }
     }
 
-    private suspend fun setBearerToken(bearerToken: String) {
+    override suspend fun setId(id: String) {
+        localDataStore.updateData { currentLocalData ->
+            currentLocalData.toBuilder()
+                .setId(id)
+                .build()
+        }
+    }
+
+    override suspend fun setBearerToken(bearerToken: String) {
         localDataStore.updateData { currentLocalData ->
             currentLocalData.toBuilder()
                 .setBearerToken(bearerToken)
@@ -71,12 +88,22 @@ class LocalDataStoreImpl @Inject constructor(
         }
     }
 
-    override suspend fun setDeviceIdAndBearerToken() {
-        val generatedDeviceId = getPersistentDeviceId()
-        val jwt = generateJWT(generatedDeviceId)
+    override suspend fun setDeviceName(name: String) {
+        localDataStore.updateData { currentLocalData ->
+            currentLocalData.toBuilder()
+                .setDeviceName(name)
+                .build()
+        }
+    }
+
+    override suspend fun setDeviceKeyNameAndBearerToken() {
+        val generatedDeviceKey = getPersistentDeviceKey()
+        val jwt = generateJWT(generatedDeviceKey)
         val generatedBearerToken = "Bearer $jwt"
+        val nameOfDevice = getDeviceName()
         Timber.i(generatedBearerToken)
-        setDeviceId(generatedDeviceId)
+        setDeviceKey(generatedDeviceKey)
+        setDeviceName(nameOfDevice)
         setBearerToken(generatedBearerToken)
     }
 
