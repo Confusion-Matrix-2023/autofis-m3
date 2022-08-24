@@ -241,6 +241,7 @@ public class YoloV5Classifier implements Classifier {
     // Number of threads in the java app
     private static final int NUM_THREADS = 4;
     private static boolean isNNAPI = false;
+
     private static boolean isGPU = false;
 
     private boolean isModelQuantized;

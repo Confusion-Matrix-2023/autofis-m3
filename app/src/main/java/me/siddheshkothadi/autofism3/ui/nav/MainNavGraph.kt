@@ -40,7 +40,7 @@ fun MainNavGraph(
 
     val screens = listOf(
         Screen.Capture,
-        Screen.History,
+        Screen.HistoryNav,
 //        Screen.Learn,
 //        Screen.Stats,
         Screen.Settings
@@ -115,10 +115,7 @@ fun MainNavGraph(
             modifier = Modifier.padding(innerPadding)
         ) {
             captureGraph(navController, mainViewModel, context)
-            composable(Screen.History.route) {
-                val historyViewModel: HistoryViewModel = hiltViewModel()
-                History(historyViewModel)
-            }
+            historyNavGraph(navController)
             composable(Screen.Learn.route) {
                 EmptyScreen()
             }

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import me.siddheshkothadi.autofism3.R
 
 sealed class Screen(
@@ -18,8 +19,11 @@ sealed class Screen(
     object EnterDetails :
         Screen("enter-details/{uri}", R.string.enter_details, Icons.Outlined.Camera, Icons.Filled.Camera)
 
+    object HistoryNav: Screen("history-nav", R.string.history, Icons.Outlined.History, Icons.Filled.History)
     object History :
         Screen("history", R.string.history, Icons.Outlined.History, Icons.Filled.History)
+    object ViewDetails :
+        Screen("view-details/{uri}", R.string.view_details, Icons.Outlined.History, Icons.Filled.History)
 
     object Learn : Screen(
         "learn",
