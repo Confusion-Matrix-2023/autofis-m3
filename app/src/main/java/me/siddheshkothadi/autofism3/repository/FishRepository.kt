@@ -2,6 +2,7 @@ package me.siddheshkothadi.autofism3.repository
 
 import android.graphics.Bitmap
 import android.graphics.RectF
+import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.Flow
 import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
@@ -29,7 +30,7 @@ interface FishRepository {
     val boundingBoxes: Flow<List<RectF>>
     val bitmapInfo: Flow<BitmapInfo>
 
-    suspend fun getWeatherData(lat: String, lon: String): Weather
+    suspend fun getWeatherData(lat: String, lon: String): JsonObject
 
     suspend fun submitDetails(imageUri: String)
 }

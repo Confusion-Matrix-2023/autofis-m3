@@ -78,6 +78,7 @@ object AppModule {
     fun provideWeatherRetrofit(): WeatherAPI {
         val retrofit = Retrofit.Builder()
             .baseUrl(WEATHER_URL)
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         return retrofit.create(WeatherAPI::class.java)

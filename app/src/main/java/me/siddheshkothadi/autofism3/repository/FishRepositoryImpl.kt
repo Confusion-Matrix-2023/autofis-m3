@@ -6,6 +6,7 @@ import android.graphics.RectF
 import android.widget.Toast
 import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -122,8 +123,9 @@ class FishRepositoryImpl(
         return newBearerToken
     }
 
-    override suspend fun getWeatherData(lat: String, lon: String): Weather {
-        return weatherAPI.getWeatherData(lat,lon,"2851a90b716da669a9118af4c2b59341")
+    override suspend fun getWeatherData(lat: String, lon: String): JsonObject {
+//        return weatherAPI.getWeatherData(lat,lon,"2851a90b716da669a9118af4c2b59341")
+        return weatherAPI.getWeatherData()
     }
 
     override val deviceId: Flow<String>

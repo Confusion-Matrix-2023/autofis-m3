@@ -77,6 +77,7 @@ class EnterDetailsViewModel @Inject constructor(
 
     val boundingBoxes: Flow<List<RectF>> = fishRepository.boundingBoxes
     val bitmapInfo: Flow<BitmapInfo> = fishRepository.bitmapInfo
+    val selectedBox = mutableStateOf(0)
 
     private val networkRequest = NetworkRequest.Builder()
         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -107,8 +108,8 @@ class EnterDetailsViewModel @Inject constructor(
                     fetchLocation()
                     val connectivityManager = getSystemService(app, ConnectivityManager::class.java) as ConnectivityManager
                     connectivityManager.requestNetwork(networkRequest, networkCallback)
-//                    val res = fishRepository.getWeatherData(latitude.value, longitude.value)
-//                    Timber.i(res.toString())
+                    val res = fishRepository.getWeatherData(latitude.value, longitude.value)
+                    Timber.i(res.toString())
                 }
             } catch (e: Exception) {
                 Timber.e(e)

@@ -8,16 +8,16 @@ import android.net.Uri
 import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -87,9 +88,23 @@ fun EnterDetails(
 
     val context = LocalContext.current
 
+    val selectedBox = remember { enterDetailsViewModel.selectedBox }
+    var expanded by remember { mutableStateOf(false) }
+
     val paintConfig = remember {
         Paint().apply {
             color = android.graphics.Color.BLUE
+            strokeWidth = 7.0f
+            style = Paint.Style.STROKE
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            strokeMiter = 100f
+        }
+    }
+
+    val redPaintConfig = remember {
+        Paint().apply {
+            color = android.graphics.Color.RED
             strokeWidth = 10.0f
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
@@ -176,33 +191,38 @@ fun EnterDetails(
                     model = Uri.parse(fishImageUri),
                     contentDescription = "Fish image",
                     modifier = Modifier
-                        .height(256.dp)
-                        .width(256.dp)
+//                        .height(256.dp)
+//                        .width(256.dp)
                         .aspectRatio(1f)
+                        .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                 )
                 if(bitmapInfo.value.bitmapHeight != 0 && bitmapInfo.value.bitmapWidth != 0) {
                     Canvas(
                         modifier = Modifier
-                            .height(256.dp)
-                            .width(256.dp)
+//                            .height(256.dp)
+//                            .width(256.dp)
                             .aspectRatio(1f)
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
                     ) {
                         val scaleY = size.height * 1f / bitmapInfo.value.bitmapWidth
                         val scaleX = size.width * 1f / bitmapInfo.value.bitmapHeight
-                        boundingBoxes.value.forEach {
+                        boundingBoxes.value.forEachIndexed { index, it ->
                             val cornerSize: Float =
                                 min(it.width(), it.height()) / 8.0f
-                            val width = exteriorPaint.measureText(context.getString(R.string.fish))
+                            val width = exteriorPaint.measureText("0")
                             val textSize = exteriorPaint.textSize
                             val paint = Paint(paintConfig)
+                            val redPaint = Paint(redPaintConfig)
                             paint.style = Paint.Style.FILL
                             paint.alpha = 160
+                            redPaint.style = Paint.Style.FILL
+                            redPaint.alpha = 160
                             val posX = it.left + cornerSize
                             val posY = it.top
 
-                            val labelString = context.getString(R.string.fish)
+                            val labelString = index.toString()
 
                             drawContext.canvas.nativeCanvas.apply {
                                 drawRoundRect(
@@ -214,14 +234,14 @@ fun EnterDetails(
                                     ),
                                     cornerSize,
                                     cornerSize,
-                                    paintConfig
+                                    if(selectedBox.value == index) redPaintConfig else paintConfig
                                 )
                                 drawRect(
                                     posX * scaleX,
                                     (posY + textSize.toInt()) * scaleY,
                                     (posX + width.toInt() * scaleX) * scaleX,
                                     posY * scaleY,
-                                    paint
+                                    if(selectedBox.value == index) redPaint else paint
                                 )
 
                                 drawText(
@@ -240,6 +260,44 @@ fun EnterDetails(
 
             Text(date)
             Text(time)
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+            ) {
+                OutlinedTextField(
+                    value = selectedBox.value.toString(),
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    label = {
+                        Text("Selected Box", color = Color.Gray)
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(Icons.Filled.ArrowDropDown, null)
+                        }
+                    }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    modifier = Modifier.fillMaxWidth(),
+                    offset = DpOffset(x = (0).dp, y = (-10).dp),
+                    onDismissRequest = { expanded = false }
+                ) {
+                    boundingBoxes.value.forEachIndexed { index, _ ->
+                        DropdownMenuItem(
+                            text = { Text(index.toString()) },
+                            onClick = {
+                                selectedBox.value = index
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             OutlinedTextField(
                 value = quantity,
