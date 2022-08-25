@@ -284,30 +284,36 @@ fun EnterDetails(
                     .width(300.dp)
                     .padding(vertical = 24.dp),
                 onClick = {
-                    if (quantity == "0" || quantity == "") {
+                    try {
+                        val quantityToInt = quantity.toInt()
+                        if (quantityToInt >= 0) {
+                            coroutineScope.launch {
+                                enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
+                                navController.navigate(Screen.History.route) {
+                                    // Pop up to the start destination of the graph to
+                                    // avoid building up a large stack of destinations
+                                    // on the back stack as users select items
+                                    popUpTo(Screen.Camera.route) {
+                                        saveState = true
+                                    }
+                                    // Avoid multiple copies of the same destination when
+                                    // re-selecting the same item
+                                    launchSingleTop = true
+                                    // Restore state when re-selecting a previously selected item
+                                    restoreState = true
+                                }
+                            }
+                        } else {
+                            throw Exception()
+                        }
+                    } catch (e: Exception) {
                         quantityError = true
+
                         Toast.makeText(
                             context,
-                            context.getString(R.string.please_enter_a_valid_quantity),
+                            "Please enter a valid quantity",
                             Toast.LENGTH_LONG
                         ).show()
-                    } else {
-                        coroutineScope.launch {
-                            enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
-                            navController.navigate(Screen.History.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
-                                popUpTo(Screen.Camera.route) {
-                                    saveState = true
-                                }
-                                // Avoid multiple copies of the same destination when
-                                // re-selecting the same item
-                                launchSingleTop = true
-                                // Restore state when re-selecting a previously selected item
-                                restoreState = true
-                            }
-                        }
                     }
                 }) {
                 Text(stringResource(R.string.submit))

@@ -3,12 +3,16 @@ package me.siddheshkothadi.autofism3.repository
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
+import android.widget.Toast
 import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishApplication
+import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.database.*
 import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
@@ -80,29 +84,44 @@ class FishRepositoryImpl(
 
     private suspend fun getBearerToken(): String {
         val bearerToken = localDataStore.bearerToken.first()
+        Timber.tag("Sid").i(bearerToken)
         if (bearerToken.isNotBlank()) return bearerToken
         localDataStore.setDeviceKeyNameAndBearerToken()
         val newBearerToken = localDataStore.bearerToken.first()
         try {
             val response = awsFileAPI.checkDevice(newBearerToken)
-            Timber.i(response.toString())
+            Timber.tag("Sid").i(response.toString())
             localDataStore.apply {
                 setDeviceKey(response.deviceKey)
                 setDeviceName(response.deviceName)
                 setId(response.id)
             }
             Timber.i("Success $newBearerToken")
-        } catch (e: HttpException) {
-            val dName = localDataStore.deviceName.first()
-            val dKey = localDataStore.deviceKey.first()
-            val response = awsFileAPI.addNewDevice(dName, dKey)
-            Timber.i(response.toString())
-            localDataStore.apply {
-                setDeviceKey(response.deviceKey)
-                setDeviceName(response.deviceName)
-                setId(response.id)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    response.toString(),
+                    Toast.LENGTH_LONG
+                ).show()
             }
-            Timber.i("Failure $newBearerToken")
+        } catch (e: HttpException) {
+//            val dName = localDataStore.deviceName.first()
+//            val dKey = localDataStore.deviceKey.first()
+//            val response = awsFileAPI.addNewDevice(dName, dKey)
+//            Timber.i(response.toString())
+//            localDataStore.apply {
+//                setDeviceKey(response.deviceKey)
+//                setDeviceName(response.deviceName)
+//                setId(response.id)
+//            }
+//            Timber.i("Failure $newBearerToken")
+//            withContext(Dispatchers.Main) {
+//                Toast.makeText(
+//                    context,
+//                    response.toString(),
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
         }
 
         return newBearerToken
