@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ఆటోఎఫ్ఐఎస్</string>
+    <string name="fish">చేప</string>
+    <string name="history">చరిత్ర</string>
+    <string name="learn">నేర్చుకుంటారు</string>
+    <string name="capture">ఫోటో తీసుకో</string>
+    <string name="stats">గణాంకాలు</string>
+    <string name="settings">సెట్టింగ్‌లు</string>
+    <string name="enter_details">వివరాలను నమోదు చేయండి</string>
+    <string name="camera">కెమెరా</string>
+    <string name="quantity_label">పరిమాణం (కిలోలలో)</string>
+    <string name="select_language">భాషను ఎంచుకోండి</string>
+    <string name="select">ఎంచుకోండి</string>
+    <string name="please_enter_a_valid_quantity">దయచేసి చెల్లుబాటు అయ్యే పరిమాణాన్ని నమోదు చేయండి</string>
+    <string name="submit">సమర్పించండి</string>
+    <string name="recognizing_fish_in_image">చిత్రంలో చేపలను గుర్తించడం</string>
+    <string name="fish_not_detected_please_try_again">చేపలు గుర్తించబడలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.</string>
+    <string name="saving_image">చిత్రాన్ని సేవ్ చేస్తోంది</string>
+    <string name="loading">లోడ్</string>
+    <string name="pending_uploads">పెండింగ్‌లో ఉన్న అప్‌లోడ్‌లు</string>
+    <string name="upload_history">అప్‌లోడ్ చరిత్ర</string>
+    <string name="fetch">పొందండి</string>
+    <string name="language">భాష</string>
+    <string name="chosen_language">ఎంచుకున్న భాష</string>
+    <string name="cancel">రద్దు చేయండి</string>
+    <string name="app_restart_note_after_language_selection">భాషను ఎంచుకున్న తర్వాత యాప్ రీస్టార్ట్ కావచ్చు.</string>
+    <string name="location_not_found">లొకేషన్ దొరకలేదు!</string>
+    <string name="drawing_bounding_boxes">బౌండింగ్ బాక్సులను గీయడం</string>
+    <string name="uploading_fish_data">చేపల డేటాను అప్‌లోడ్ చేస్తోంది</string>
+    <string name="map_view_may_not_render_properly">తక్కువ ఇంటర్నెట్ కనెక్టివిటీ కారణంగా పటం సరిగ్గా రెండర్ కాకపోవచ్చు!</string>
+    <string name="view_details">వివరాలను వీక్షించండి</string>
+</resources>

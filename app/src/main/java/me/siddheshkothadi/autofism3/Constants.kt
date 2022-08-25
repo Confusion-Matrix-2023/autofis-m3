@@ -12,7 +12,9 @@ object Constants {
     val availableLanguages = listOf(
         Language.ENGLISH,
         Language.HINDI,
-        Language.Marathi
+        Language.MARATHI,
+        Language.TELUGU,
+        Language.BENGALI
     )
 
 }
