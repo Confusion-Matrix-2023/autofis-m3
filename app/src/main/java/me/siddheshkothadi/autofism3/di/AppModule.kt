@@ -25,7 +25,7 @@ import javax.inject.Singleton
 const val BASE_URL = "https://file-upload-server.siddheshkothadi.repl.co/"
 //const val BASE_URL = "https://autofis-server.siddheshkothadi.repl.co/"
 //const val BASE_URL = "http://127.0.0.1:5000/"
-const val AWS_URL = "http://20.244.36.11:8001/"
+const val AWS_URL = "http://20.244.36.11:8000/"
 
 @Module
 @InstallIn(SingletonComponent::class)
