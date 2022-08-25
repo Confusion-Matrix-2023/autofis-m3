@@ -99,32 +99,32 @@ fun CameraScreen(
                                 .setTargetRotation(previewView.display.rotation)
                                 .build()
 
-                            val imageAnalysis = ImageAnalysis.Builder()
-                                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                                .build()
-                                .apply {
-                                    setAnalyzer(
-                                        executor,
-                                        CustomImageAnalyzer { rect, label, imageHeight, imageWidth ->
-                                            top = rect.top * 1f
-                                            bottom = rect.bottom * 1f
-                                            left = rect.left * 1f
-                                            right = rect.right * 1f
-
-                                            h = imageHeight * 1f
-                                            w = imageWidth * 1f
-
-                                            detectedLabel = label.text
-                                            accuracyText = label.confidence.toString()
-                                        })
-                                }
+//                            val imageAnalysis = ImageAnalysis.Builder()
+//                                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+//                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+//                                .build()
+//                                .apply {
+//                                    setAnalyzer(
+//                                        executor,
+//                                        CustomImageAnalyzer { rect, label, imageHeight, imageWidth ->
+//                                            top = rect.top * 1f
+//                                            bottom = rect.bottom * 1f
+//                                            left = rect.left * 1f
+//                                            right = rect.right * 1f
+//
+//                                            h = imageHeight * 1f
+//                                            w = imageWidth * 1f
+//
+//                                            detectedLabel = label.text
+//                                            accuracyText = label.confidence.toString()
+//                                        })
+//                                }
 
                             cameraProvider.unbindAll()
                             camera = cameraProvider.bindToLifecycle(
                                 lifecycleOwner,
                                 cameraSelector,
-                                imageAnalysis,
+//                                imageAnalysis,
                                 imageCapture,
                                 preview
                             )

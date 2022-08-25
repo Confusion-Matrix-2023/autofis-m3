@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -26,12 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.launch
-import me.siddheshkothadi.autofism3.ui.component.MapView
 import me.siddheshkothadi.autofism3.ui.nav.Screen
 import me.siddheshkothadi.autofism3.ui.viewmodel.EnterDetailsViewModel
 
@@ -134,42 +131,48 @@ fun EnterDetails(
                         .padding(20.dp)
                 )
 
-                MapView(
-                    latitude, longitude,
-                    Modifier
-                        .size(256.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                )
+//                MapView(
+//                    latitude, longitude,
+//                    Modifier
+//                        .size(256.dp)
+//                        .clip(RoundedCornerShape(12.dp))
+//                )
 
                 Button(
                     modifier = Modifier
                         .width(300.dp)
                         .padding(vertical = 24.dp),
                     onClick = {
-                        if (quantity == "0" || quantity == "") {
+                        try {
+                            val quantityToInt = quantity.toInt()
+                            if (quantityToInt >= 0) {
+                                coroutineScope.launch {
+                                    enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
+                                    navController.navigate(Screen.History.route) {
+                                        // Pop up to the start destination of the graph to
+                                        // avoid building up a large stack of destinations
+                                        // on the back stack as users select items
+                                        popUpTo(Screen.Camera.route) {
+                                            saveState = true
+                                        }
+                                        // Avoid multiple copies of the same destination when
+                                        // re-selecting the same item
+                                        launchSingleTop = true
+                                        // Restore state when re-selecting a previously selected item
+                                        restoreState = true
+                                    }
+                                }
+                            } else {
+                                throw Exception()
+                            }
+                        } catch (e: Exception) {
                             quantityError = true
+
                             Toast.makeText(
                                 context,
                                 "Please enter a valid quantity",
                                 Toast.LENGTH_LONG
                             ).show()
-                        } else {
-                            coroutineScope.launch {
-                                enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
-                                navController.navigate(Screen.History.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    // on the back stack as users select items
-                                    popUpTo(Screen.Camera.route) {
-                                        saveState = true
-                                    }
-                                    // Avoid multiple copies of the same destination when
-                                    // re-selecting the same item
-                                    launchSingleTop = true
-                                    // Restore state when re-selecting a previously selected item
-                                    restoreState = true
-                                }
-                            }
                         }
                     }) {
                     Text("Submit")
