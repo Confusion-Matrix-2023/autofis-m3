@@ -12,15 +12,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishApplication
-import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.database.*
 import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
-import me.siddheshkothadi.autofism3.network.AWSFileAPI
-import me.siddheshkothadi.autofism3.network.FileAPI
-import me.siddheshkothadi.autofism3.network.UploadStreamRequestBody
+import me.siddheshkothadi.autofism3.model.weather.Weather
+import me.siddheshkothadi.autofism3.network.*
+import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.workmanager.UploadWorker
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -37,6 +36,8 @@ class FishRepositoryImpl(
     private val localDataStore: LocalDataStore,
     private val fileAPI: FileAPI,
     private val awsFileAPI: AWSFileAPI,
+    private val weatherAPI: WeatherAPI,
+    private val s3Bucket: S3Bucket,
     private val context: FishApplication
 ) : FishRepository {
     private val workManager = WorkManager.getInstance(context)
@@ -88,6 +89,7 @@ class FishRepositoryImpl(
         if (bearerToken.isNotBlank()) return bearerToken
         localDataStore.setDeviceKeyNameAndBearerToken()
         val newBearerToken = localDataStore.bearerToken.first()
+        Timber.tag("Sid").i(newBearerToken)
         try {
             val response = awsFileAPI.checkDevice(newBearerToken)
             Timber.tag("Sid").i(response.toString())
@@ -105,26 +107,84 @@ class FishRepositoryImpl(
                 ).show()
             }
         } catch (e: HttpException) {
-//            val dName = localDataStore.deviceName.first()
-//            val dKey = localDataStore.deviceKey.first()
-//            val response = awsFileAPI.addNewDevice(dName, dKey)
-//            Timber.i(response.toString())
-//            localDataStore.apply {
-//                setDeviceKey(response.deviceKey)
-//                setDeviceName(response.deviceName)
-//                setId(response.id)
-//            }
-//            Timber.i("Failure $newBearerToken")
-//            withContext(Dispatchers.Main) {
-//                Toast.makeText(
-//                    context,
-//                    response.toString(),
-//                    Toast.LENGTH_LONG
-//                ).show()
-//            }
+            val dName = localDataStore.deviceName.first()
+            val dKey = localDataStore.deviceKey.first()
+            val response = awsFileAPI.addNewDevice(AddDeviceRequest(dName, dKey))
+            Timber.i(response.toString())
+            localDataStore.apply {
+                setDeviceKey(response.deviceKey)
+                setDeviceName(response.deviceName)
+                setId(response.id)
+            }
+            Timber.i("Failure $newBearerToken")
         }
 
         return newBearerToken
+    }
+
+    override suspend fun getWeatherData(lat: String, lon: String): Weather {
+        return weatherAPI.getWeatherData(lat,lon,"2851a90b716da669a9118af4c2b59341")
+    }
+
+    override val deviceId: Flow<String>
+        get() = localDataStore.id
+
+    override suspend fun submitDetails(imageUri: String) {
+        val token = getBearerToken()
+        val deviceId = localDataStore.id.first()
+        val tempFish = getPendingUploadByImageUri(imageUri)
+
+        Timber.i(token)
+        Timber.i(tempFish.toString())
+        Timber.i(deviceId)
+
+        val imageFile: File = File(context.filesDir, imageUri.split('/').last())
+
+        val request = UploadStreamRequestBody("image/jpeg", imageFile.inputStream()) { progress ->
+            Timber.i(" $progress")
+        }
+
+        val requestImage = MultipartBody.Part.createFormData(
+            "image_url",
+            imageFile.name,
+            request
+        )
+
+        val requestLongitude = tempFish.longitude.toRequestBody()
+        val requestLatitude = tempFish.latitude.toRequestBody()
+        val requestTimestamp = DateUtils.getSubmissionTimeStamp(tempFish.timestamp.toLong()).toRequestBody()
+        val requestDeviceId = deviceId.toRequestBody()
+
+        val response = awsFileAPI.submitDetailsWithImage(
+            token,
+            requestImage,
+            requestLongitude,
+            requestLatitude,
+            requestDeviceId,
+            requestTimestamp
+        )
+
+        Timber.i(response.toString())
+//        val requestBody: RequestBody = RequestBody.create(
+//            "image/jpeg".toMediaTypeOrNull(),
+//            file
+//        )
+
+//        val fileUri = file.getUri(context)
+
+//        fileUri?.let {
+////            val reqBody = context.contentResolver.readAsRequestBody(it)
+//            val reqBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+//            val mimeType = context.contentResolver.getType(it)
+//
+//            Timber.i(reqBody.toString())
+//            Timber.i(mimeType.toString())
+//
+//            if (mimeType != null) {
+//                s3Bucket.uploadImage(url, "image/jpeg", reqBody)
+//            }
+//        }
+
     }
 
     override suspend fun enqueueUpload(fish: PendingUploadFish) {
@@ -186,30 +246,30 @@ class FishRepositoryImpl(
             showNotification(id, bitmap, 0)
             val fish = getPendingUploadByImageUri(imageUri)
 
-            val request = UploadStreamRequestBody("image/*", imageFile.inputStream()) { progress ->
+            val request = UploadStreamRequestBody("image/jpeg", imageFile.inputStream()) { progress ->
                 Timber.i("Upload Progress $progress")
                 showNotification(id, bitmap, progress)
             }
 
             val requestImage = MultipartBody.Part.createFormData(
-                "file",
+                "image_url",
                 imageFile.name,
                 request
             )
+            val bearerToken = getBearerToken()
+            val deviceId = localDataStore.id.first()
 
             val requestLongitude = fish.longitude.toRequestBody()
             val requestLatitude = fish.latitude.toRequestBody()
-            val requestQuantity = fish.quantity.toRequestBody()
-            val requestTimestamp = fish.timestamp.toRequestBody()
+            val requestTimestamp = DateUtils.getSubmissionTimeStamp(fish.timestamp.toLong()).toRequestBody()
+            val requestDeviceId = deviceId.toRequestBody()
 
-            val bearerToken = getBearerToken()
-
-            fileAPI.uploadData(
+            awsFileAPI.submitDetailsWithImage(
                 bearerToken,
                 requestImage,
                 requestLongitude,
                 requestLatitude,
-                requestQuantity,
+                requestDeviceId,
                 requestTimestamp
             )
 

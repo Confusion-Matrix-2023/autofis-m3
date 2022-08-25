@@ -11,6 +11,7 @@ import androidx.work.workDataOf
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import me.siddheshkothadi.autofism3.R
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import timber.log.Timber

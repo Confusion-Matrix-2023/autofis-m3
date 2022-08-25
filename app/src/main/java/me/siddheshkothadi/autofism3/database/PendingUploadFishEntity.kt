@@ -11,5 +11,15 @@ data class PendingUploadFishEntity(
     val longitude: String,
     val latitude: String,
     val quantity: String,
-    val workId: UUID
+    val workId: UUID,
+    // Temp
+    var temp: Double? = null,
+    var feelsLike: Double? = null,
+    var tempMin: Double? = null,
+    var tempMax: Double? = null,
+    var pressure: Int? = null,
+    var humidity: Int? = null,
+    // Wind
+    var speed : Double? = null,
+    var deg   : Int?    = null
 )

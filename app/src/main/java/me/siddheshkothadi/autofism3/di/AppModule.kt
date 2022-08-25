@@ -15,6 +15,8 @@ import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.datastore.LocalDataStoreImpl
 import me.siddheshkothadi.autofism3.network.AWSFileAPI
 import me.siddheshkothadi.autofism3.network.FileAPI
+import me.siddheshkothadi.autofism3.network.S3Bucket
+import me.siddheshkothadi.autofism3.network.WeatherAPI
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import me.siddheshkothadi.autofism3.repository.FishRepositoryImpl
 import retrofit2.Retrofit
@@ -26,6 +28,7 @@ const val BASE_URL = "https://file-upload-server.siddheshkothadi.repl.co/"
 //const val BASE_URL = "https://autofis-server.siddheshkothadi.repl.co/"
 //const val BASE_URL = "http://127.0.0.1:5000/"
 const val AWS_URL = "http://20.244.36.11:8000/"
+const val WEATHER_URL = "https://api.openweathermap.org/"
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -57,6 +60,27 @@ object AppModule {
             .build()
 
         return retrofit.create(AWSFileAPI::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideS3Retrofit(): S3Bucket {
+        val retrofit = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+
+        return retrofit.create(S3Bucket::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideWeatherRetrofit(): WeatherAPI {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(WEATHER_URL)
+            .build()
+
+        return retrofit.create(WeatherAPI::class.java)
     }
 
     @Singleton
@@ -93,6 +117,8 @@ object AppModule {
         localDataStore: LocalDataStore,
         fileAPI: FileAPI,
         awsFileAPI: AWSFileAPI,
+        weatherAPI: WeatherAPI,
+        s3Bucket: S3Bucket,
         context: FishApplication
     ): FishRepository {
         return FishRepositoryImpl(
@@ -101,6 +127,8 @@ object AppModule {
             localDataStore,
             fileAPI,
             awsFileAPI,
+            weatherAPI,
+            s3Bucket,
             context
         )
     }

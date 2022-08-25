@@ -6,8 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
+import me.siddheshkothadi.autofism3.model.weather.Weather
+import me.siddheshkothadi.autofism3.network.SubmitBody
 
 interface FishRepository {
+    val deviceId: Flow<String>
     suspend fun enqueueUpload(fish: PendingUploadFish)
 
     fun getPendingUploads(): Flow<List<PendingUploadFish>>
@@ -25,4 +28,8 @@ interface FishRepository {
 
     val boundingBoxes: Flow<List<RectF>>
     val bitmapInfo: Flow<BitmapInfo>
+
+    suspend fun getWeatherData(lat: String, lon: String): Weather
+
+    suspend fun submitDetails(imageUri: String)
 }

@@ -107,6 +107,8 @@ class EnterDetailsViewModel @Inject constructor(
                     fetchLocation()
                     val connectivityManager = getSystemService(app, ConnectivityManager::class.java) as ConnectivityManager
                     connectivityManager.requestNetwork(networkRequest, networkCallback)
+//                    val res = fishRepository.getWeatherData(latitude.value, longitude.value)
+//                    Timber.i(res.toString())
                 }
             } catch (e: Exception) {
                 Timber.e(e)

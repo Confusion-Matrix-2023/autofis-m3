@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
@@ -40,6 +41,7 @@ class MainViewModel @Inject constructor(
     init {
         Timber.i("Init Block")
         viewModelScope.launch(Dispatchers.Main) {
+            Timber.i(localDataStore.bearerToken.first())
 //            viewModelScope.launch(Dispatchers.Main) {
                 isLoading.value = true
 //            }

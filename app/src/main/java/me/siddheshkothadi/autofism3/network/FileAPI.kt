@@ -1,6 +1,7 @@
 package me.siddheshkothadi.autofism3.network
 
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
+import me.siddheshkothadi.autofism3.model.weather.Weather
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -17,6 +18,11 @@ interface FileAPI {
         @Part("quantity") quantity: RequestBody,
         @Part("timestamp") timestamp: RequestBody,
     )
+
+    @POST("/api/weather")
+    suspend fun getWeather(
+        @Body locationData: LocationData
+    ): Weather
 
     @GET("/api/history")
     suspend fun getHistory(
