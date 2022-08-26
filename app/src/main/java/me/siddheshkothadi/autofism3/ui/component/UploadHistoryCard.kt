@@ -38,34 +38,34 @@ fun UploadHistoryCard(
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = fish.image_url,
-                contentDescription = "Fish Image",
-                modifier = Modifier
-                    .size(84.dp)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentScale = ContentScale.Crop
-            )
+//            AsyncImage(
+//                model = fish.image_url,
+//                contentDescription = "Fish Image",
+//                modifier = Modifier
+//                    .size(84.dp)
+//                    .clip(RoundedCornerShape(10.dp)),
+//                contentScale = ContentScale.Crop
+//            )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text(fish.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 4.dp))
-                    Text(DateUtils.getDate(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
-                    Text(DateUtils.getTime(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
+                    fish.prediction?.let { Text(it, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 4.dp)) }
+//                    Text(DateUtils.getDate(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
+//                    Text(DateUtils.getTime(context, fish.timestamp), style = MaterialTheme.typography.bodySmall)
                 }
-                if(fish.latitude.isNotBlank() && fish.longitude.isNotBlank()) {
-                    IconButton(onClick = {
-                        val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
-                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                        mapIntent.setPackage("com.google.android.apps.maps")
-                        context.startActivity(mapIntent)
-                    }) {
-                        Icon(Icons.Filled.PinDrop, contentDescription = null)
-                    }
-                }
+//                if(fish.latitude.isNotBlank() && fish.longitude.isNotBlank()) {
+//                    IconButton(onClick = {
+//                        val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
+//                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+//                        mapIntent.setPackage("com.google.android.apps.maps")
+//                        context.startActivity(mapIntent)
+//                    }) {
+//                        Icon(Icons.Filled.PinDrop, contentDescription = null)
+//                    }
+//                }
             }
         }
     }

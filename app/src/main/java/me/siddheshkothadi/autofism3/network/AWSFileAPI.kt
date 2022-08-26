@@ -1,5 +1,7 @@
 package me.siddheshkothadi.autofism3.network
 
+import com.google.gson.JsonObject
+import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -28,7 +30,18 @@ interface AWSFileAPI {
         @Part image: MultipartBody.Part,
         @Part("longitude") longitude: RequestBody,
         @Part("latitude") latitude: RequestBody,
+        @Part("quantity") quantity: RequestBody,
         @Part("device_id") deviceId: RequestBody,
         @Part("submission_timestamp") subTimeStamp: RequestBody,
-    ): SubmitResponse
+        @Part("temperature") temp: RequestBody?,
+        @Part("pressure") pressure: RequestBody?,
+        @Part("humidity") humidity: RequestBody?,
+        @Part("wind_speed") speed: RequestBody?,
+        @Part("wind_direction") deg: RequestBody?,
+    ): JsonObject
+
+    @GET("/api/userSubmission")
+    suspend fun getUploadHistory(
+        @Header("Authorization") bearerToken: String
+    ): List<UploadHistoryFish>
 }

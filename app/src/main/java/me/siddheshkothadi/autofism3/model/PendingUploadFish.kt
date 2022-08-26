@@ -11,13 +11,10 @@ data class PendingUploadFish(
     val quantity: String,
     var workId: UUID = UUID.randomUUID(),
     // Temp
-    var temp: Double? = null,
-    var feelsLike: Double? = null,
-    var tempMin: Double? = null,
-    var tempMax: Double? = null,
-    var pressure: Int? = null,
-    var humidity: Int? = null,
+    var temp: String? = null,
+    var pressure: String? = null,
+    var humidity: String? = null,
     // Wind
-    var speed : Double? = null,
-    var deg   : Int?    = null
+    var speed : String? = null,
+    var deg   : String?    = null
 )

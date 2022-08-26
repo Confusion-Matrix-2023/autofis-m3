@@ -157,16 +157,16 @@ class FishRepositoryImpl(
         val requestTimestamp = DateUtils.getSubmissionTimeStamp(tempFish.timestamp.toLong()).toRequestBody()
         val requestDeviceId = deviceId.toRequestBody()
 
-        val response = awsFileAPI.submitDetailsWithImage(
-            token,
-            requestImage,
-            requestLongitude,
-            requestLatitude,
-            requestDeviceId,
-            requestTimestamp
-        )
-
-        Timber.i(response.toString())
+//        val response = awsFileAPI.submitDetailsWithImage(
+//            token,
+//            requestImage,
+//            requestLongitude,
+//            requestLatitude,
+//            requestDeviceId,
+//            requestTimestamp
+//        )
+//
+//        Timber.i(response.toString())
 //        val requestBody: RequestBody = RequestBody.create(
 //            "image/jpeg".toMediaTypeOrNull(),
 //            file
@@ -263,17 +263,32 @@ class FishRepositoryImpl(
 
             val requestLongitude = fish.longitude.toRequestBody()
             val requestLatitude = fish.latitude.toRequestBody()
+            val requestQuantity = fish.quantity.toRequestBody()
             val requestTimestamp = DateUtils.getSubmissionTimeStamp(fish.timestamp.toLong()).toRequestBody()
             val requestDeviceId = deviceId.toRequestBody()
 
-            awsFileAPI.submitDetailsWithImage(
+            val requestTemp = fish.temp?.toRequestBody()
+            val requestPressure = fish.pressure?.toRequestBody()
+            val requestHumidity = fish.humidity?.toRequestBody()
+            val requestSpeed = fish.speed?.toRequestBody()
+            val requestDeg = fish.deg?.toRequestBody()
+
+            val res = awsFileAPI.submitDetailsWithImage(
                 bearerToken,
                 requestImage,
                 requestLongitude,
                 requestLatitude,
+                requestQuantity,
                 requestDeviceId,
-                requestTimestamp
+                requestTimestamp,
+                requestTemp,
+                requestPressure,
+                requestHumidity,
+                requestSpeed,
+                requestDeg
             )
+
+            Timber.i(res.toString())
 
             deleteFish(fish)
             deleteFishImage(fish.imageUri)
@@ -287,7 +302,7 @@ class FishRepositoryImpl(
         val bearerToken = getBearerToken()
 
         try {
-            val updatedUploadHistory = fileAPI.getHistory(bearerToken)
+            val updatedUploadHistory = awsFileAPI.getUploadHistory(bearerToken)
             uploadHistoryFishDAO.deleteAll()
             uploadHistoryFishDAO.insertMany(
                 updatedUploadHistory.map {

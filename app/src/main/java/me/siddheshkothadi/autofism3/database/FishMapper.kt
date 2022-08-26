@@ -1,5 +1,6 @@
 package me.siddheshkothadi.autofism3.database
 
+import androidx.room.PrimaryKey
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 
@@ -10,7 +11,12 @@ fun PendingUploadFishEntity.toPendingUploadFish(): PendingUploadFish {
         latitude = latitude,
         quantity = quantity,
         timestamp = timestamp,
-        workId = workId
+        workId = workId,
+        temp = temp,
+        pressure = pressure,
+        humidity = humidity,
+        speed = speed,
+        deg = deg
     )
 }
 
@@ -21,30 +27,31 @@ fun PendingUploadFish.toPendingUploadFishEntity(): PendingUploadFishEntity {
         latitude = latitude,
         quantity = quantity,
         timestamp = timestamp,
-        workId = workId
+        workId = workId,
+        temp = temp,
+        pressure = pressure,
+        humidity = humidity,
+        speed = speed,
+        deg = deg
     )
 }
 
 fun UploadHistoryFishEntity.toUploadHistoryFish(): UploadHistoryFish {
     return UploadHistoryFish(
-        _id = _id,
-        name = name,
-        image_url = image_url,
-        longitude = longitude,
-        latitude = latitude,
-        quantity = quantity,
-        timestamp = timestamp
+        id = id,
+        submissionId = submissionId,
+        prediction = prediction,
+        confidence = confidence,
+        expertCorrection = expertCorrection
     )
 }
 
 fun UploadHistoryFish.toUploadHistoryFishEntity(): UploadHistoryFishEntity {
     return UploadHistoryFishEntity(
-        _id = _id,
-        name = name,
-        image_url = image_url,
-        longitude = longitude,
-        latitude = latitude,
-        quantity = quantity,
-        timestamp = timestamp
+        id = id,
+        submissionId = submissionId,
+        prediction = prediction,
+        confidence = confidence,
+        expertCorrection = expertCorrection
     )
 }

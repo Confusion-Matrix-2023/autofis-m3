@@ -23,6 +23,7 @@ import com.google.android.gms.location.LocationSettingsResponse
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,6 +36,7 @@ import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.repository.FishRepository
 import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.utils.awaitCurrentLocation
+import me.siddheshkothadi.autofism3.utils.toCelsius
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -79,6 +81,12 @@ class EnterDetailsViewModel @Inject constructor(
     val bitmapInfo: Flow<BitmapInfo> = fishRepository.bitmapInfo
     val selectedBox = mutableStateOf(0)
 
+    val temp: MutableState<String?> = mutableStateOf(null)
+    val pressure: MutableState<String?> = mutableStateOf(null)
+    val humidity: MutableState<String?> = mutableStateOf(null)
+    val speed: MutableState<String?> = mutableStateOf(null)
+    val deg: MutableState<String?> = mutableStateOf(null)
+
     private val networkRequest = NetworkRequest.Builder()
         .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -109,6 +117,13 @@ class EnterDetailsViewModel @Inject constructor(
                     val connectivityManager = getSystemService(app, ConnectivityManager::class.java) as ConnectivityManager
                     connectivityManager.requestNetwork(networkRequest, networkCallback)
                     val res = fishRepository.getWeatherData(latitude.value, longitude.value)
+                    temp.value = res.get("main").asJsonObject.get("temp").toString().toCelsius()
+                    pressure.value = res.get("main").asJsonObject.get("pressure").toString()
+                    humidity.value = res.get("main").asJsonObject.get("humidity").toString()
+                    speed.value = res.get("wind").asJsonObject.get("speed").toString()
+                    deg.value = res.get("wind").asJsonObject.get("deg").toString()
+
+                    Timber.i("$temp $pressure $humidity $speed $deg")
                     Timber.i(res.toString())
                 }
             } catch (e: Exception) {
@@ -172,7 +187,12 @@ class EnterDetailsViewModel @Inject constructor(
                     timestamp = timestamp.value,
                     longitude = longitude.value,
                     latitude = latitude.value,
-                    quantity = quantity.value
+                    quantity = quantity.value,
+                    temp = temp.value,
+                    humidity = humidity.value,
+                    pressure = pressure.value,
+                    speed = speed.value,
+                    deg = deg.value
                 )
 
                 fishRepository.enqueueUpload(fish)

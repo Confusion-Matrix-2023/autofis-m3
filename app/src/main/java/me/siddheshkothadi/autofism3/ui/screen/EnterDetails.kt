@@ -5,7 +5,6 @@ import android.app.Activity
 import android.graphics.Paint
 import android.graphics.RectF
 import android.net.Uri
-import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -16,8 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -69,7 +66,8 @@ fun EnterDetails(
         }
     }
 
-    val bitmapInfo = enterDetailsViewModel.bitmapInfo.collectAsState(initial = BitmapInfo.getDefaultInstance())
+    val bitmapInfo =
+        enterDetailsViewModel.bitmapInfo.collectAsState(initial = BitmapInfo.getDefaultInstance())
     val boundingBoxes = enterDetailsViewModel.boundingBoxes.collectAsState(initial = listOf())
 
     val isLoading by remember { enterDetailsViewModel.isLoading }
@@ -79,6 +77,12 @@ fun EnterDetails(
     val date by enterDetailsViewModel.dateString.collectAsState(initial = "Loading...")
     val time by enterDetailsViewModel.timeString.collectAsState(initial = "Loading...")
     val isConnectedToNetwork by remember { enterDetailsViewModel.isConnectedToNetwork }
+
+    val temp by remember { enterDetailsViewModel.temp }
+    val pressure by remember { enterDetailsViewModel.pressure }
+    val humidity by remember { enterDetailsViewModel.humidity }
+    val speed by remember { enterDetailsViewModel.speed }
+    val deg by remember { enterDetailsViewModel.deg }
 
     var quantityError by remember { mutableStateOf(false) }
 
@@ -104,7 +108,7 @@ fun EnterDetails(
 
     val redPaintConfig = remember {
         Paint().apply {
-            color = android.graphics.Color.RED
+            color = android.graphics.Color.GREEN
             strokeWidth = 10.0f
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
@@ -182,9 +186,8 @@ fun EnterDetails(
         ) {
             Box(
                 modifier = Modifier
-                    .height(256.dp)
-                    .width(256.dp)
                     .aspectRatio(1f)
+                    .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
             ) {
                 AsyncImage(
@@ -197,7 +200,7 @@ fun EnterDetails(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                 )
-                if(bitmapInfo.value.bitmapHeight != 0 && bitmapInfo.value.bitmapWidth != 0) {
+                if (bitmapInfo.value.bitmapHeight != 0 && bitmapInfo.value.bitmapWidth != 0) {
                     Canvas(
                         modifier = Modifier
 //                            .height(256.dp)
@@ -234,14 +237,14 @@ fun EnterDetails(
                                     ),
                                     cornerSize,
                                     cornerSize,
-                                    if(selectedBox.value == index) redPaintConfig else paintConfig
+                                    if (selectedBox.value == index) redPaintConfig else paintConfig
                                 )
                                 drawRect(
                                     posX * scaleX,
                                     (posY + textSize.toInt()) * scaleY,
                                     (posX + width.toInt() * scaleX) * scaleX,
                                     posY * scaleY,
-                                    if(selectedBox.value == index) redPaint else paint
+                                    if (selectedBox.value == index) redPaint else paint
                                 )
 
                                 drawText(
@@ -261,16 +264,20 @@ fun EnterDetails(
             Text(date)
             Text(time)
 
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
                 OutlinedTextField(
                     value = selectedBox.value.toString(),
-                    onValueChange = {},
                     modifier = Modifier.fillMaxWidth(),
+                    onValueChange = {},
                     readOnly = true,
                     label = {
                         Text("Selected Box", color = Color.Gray)
@@ -281,10 +288,11 @@ fun EnterDetails(
                         }
                     }
                 )
+//                }
+
                 DropdownMenu(
                     expanded = expanded,
-                    modifier = Modifier.fillMaxWidth(),
-                    offset = DpOffset(x = (0).dp, y = (-10).dp),
+                    modifier = Modifier.align(Alignment.Center),
                     onDismissRequest = { expanded = false }
                 ) {
                     boundingBoxes.value.forEachIndexed { index, _ ->
@@ -299,82 +307,188 @@ fun EnterDetails(
                 }
             }
 
-            OutlinedTextField(
-                value = quantity,
-                onValueChange = {
-                    enterDetailsViewModel.setQuantity(it)
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                label = {
-                    Text(stringResource(R.string.quantity_label), color = Color.Gray)
-                },
-                isError = quantityError,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-            )
-
-            if (latitude.isNotBlank() && longitude.isNotBlank()) {
-                if(!isConnectedToNetwork) {
-                    Text(stringResource(R.string.map_view_may_not_render_properly), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-                    Spacer(Modifier.height(12.dp))
-                }
-                MapView(
-                    latitude, longitude,
-                    Modifier
-                        .size(256.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                )
-            } else {
-                if (isLoading) {
-                    CircularProgressIndicator(Modifier.size(20.dp))
-                } else {
-                    Text(stringResource(id = R.string.location_not_found), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-                }
-            }
-
-            Button(
-                modifier = Modifier
-                    .width(300.dp)
-                    .padding(vertical = 24.dp),
-                onClick = {
-                    try {
-                        val quantityToInt = quantity.toInt()
-                        if (quantityToInt >= 0) {
-                            coroutineScope.launch {
-                                enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
-                                navController.navigate(Screen.History.route) {
-                                    // Pop up to the start destination of the graph to
-                                    // avoid building up a large stack of destinations
-                                    // on the back stack as users select items
-                                    popUpTo(Screen.Camera.route) {
-                                        saveState = true
-                                    }
-                                    // Avoid multiple copies of the same destination when
-                                    // re-selecting the same item
-                                    launchSingleTop = true
-                                    // Restore state when re-selecting a previously selected item
-                                    restoreState = true
-                                }
-                            }
-                        } else {
-                            throw Exception()
-                        }
-                    } catch (e: Exception) {
-                        quantityError = true
-
-                        Toast.makeText(
-                            context,
-                            "Please enter a valid quantity",
-                            Toast.LENGTH_LONG
-                        ).show()
+            if (!isLoading) {
+                Column(
+                    Modifier.fillMaxWidth().padding(12.dp)
+                ) {
+                temp?.let {
+                    Row() {
+                        Text(
+                            "Temperature",
+                            modifier = Modifier
+                                .weight(1f)
+                                .border(1.dp, Color.White)
+                                .background(Color.DarkGray)
+                                .padding(8.dp)
+                        )
+                        Text("$it°C", modifier = Modifier
+                            .weight(1f)
+                            .border(1.dp, Color.White)
+                            .padding(8.dp))
                     }
-                }) {
-                Text(stringResource(R.string.submit))
+                }
+                pressure?.let {
+                    Row() {
+                        Text(
+                            "Pressure",
+                            modifier = Modifier
+                                .weight(1f)
+                                .border(1.dp, Color.White)
+                                .background(Color.DarkGray)
+                                .padding(8.dp)
+                        )
+                        Text(
+                            "$it hPa", modifier = Modifier
+                                .weight(1f)
+                                .border(1.dp, Color.White)
+                                .padding(8.dp)
+                        )
+                    }
+                    humidity?.let {
+                        Row() {
+                            Text(
+                                "Humidity",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(1.dp, Color.White)
+                                    .background(Color.DarkGray)
+                                    .padding(8.dp)
+                            )
+                            Text(
+                                "$it%",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(1.dp, Color.White)
+                                    .padding(8.dp)
+                            )
+                        }
+                    }
+                    speed?.let {
+                        Row() {
+                            Text(
+                                "Wind Speed",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(1.dp, Color.White)
+                                    .background(Color.DarkGray)
+                                    .padding(8.dp)
+                            )
+                            Text(
+                                "$it m/sec",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(1.dp, Color.White)
+                                    .padding(8.dp)
+                            )
+                        }
+                    }
+                    deg?.let {
+                        Row() {
+                            Text(
+                                "Wind Direction",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(1.dp, Color.White)
+                                    .background(Color.DarkGray)
+                                    .padding(8.dp)
+                            )
+                            Text(
+                                "$it°",
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(1.dp, Color.White)
+                                    .padding(8.dp)
+                            )
+                        }
+                    }
+                }
+                }
+
+                OutlinedTextField(
+                    value = quantity,
+                    onValueChange = {
+                        enterDetailsViewModel.setQuantity(it)
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    label = {
+                        Text(stringResource(R.string.quantity_label), color = Color.Gray)
+                    },
+                    isError = quantityError,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp)
+                )
+
+                if (latitude.isNotBlank() && longitude.isNotBlank()) {
+                    if (!isConnectedToNetwork) {
+                        Text(
+                            stringResource(R.string.map_view_may_not_render_properly),
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(12.dp))
+                    }
+                    MapView(
+                        latitude, longitude,
+                        Modifier
+                            .size(256.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                    )
+                } else {
+                    if (isLoading) {
+                        CircularProgressIndicator(Modifier.size(20.dp))
+                    } else {
+                        Text(
+                            stringResource(id = R.string.location_not_found),
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                Button(
+                    modifier = Modifier
+                        .width(300.dp)
+                        .padding(vertical = 24.dp),
+                    onClick = {
+                        try {
+                            val quantityToInt = quantity.toInt()
+                            if (quantityToInt >= 0) {
+                                coroutineScope.launch {
+                                    enterDetailsViewModel.enqueueDataUploadRequest(fishImageUri)
+                                    navController.navigate(Screen.History.route) {
+                                        // Pop up to the start destination of the graph to
+                                        // avoid building up a large stack of destinations
+                                        // on the back stack as users select items
+                                        popUpTo(Screen.Camera.route) {
+                                            saveState = true
+                                        }
+                                        // Avoid multiple copies of the same destination when
+                                        // re-selecting the same item
+                                        launchSingleTop = true
+                                        // Restore state when re-selecting a previously selected item
+                                        restoreState = true
+                                    }
+                                }
+                            } else {
+                                throw Exception()
+                            }
+                        } catch (e: Exception) {
+                            quantityError = true
+
+                            Toast.makeText(
+                                context,
+                                "Please enter a valid quantity",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }) {
+                    Text(stringResource(R.string.submit))
+                }
             }
         }
     }
