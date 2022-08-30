@@ -7,8 +7,17 @@ import com.google.gson.annotations.SerializedName
 @Entity
 data class UploadHistoryFishEntity(
     @PrimaryKey val id: String,
-    val submissionId: String,
+    val submissionId: String?,
     val prediction: String?,
-    val confidence: String?,
-    val expertCorrection: String?
+    val expertCorrection: String?,
+    val quantity: String?,
+    val submission_timestamp: String?,
+    val longitude: String?,
+    val latitude: String?,
+    val image_url: String?,
+    val temperature: String?,
+    val humidity: String?,
+    val pressure: String?,
+    val wind_speed: String?,
+    val wind_direction: String?,
 )

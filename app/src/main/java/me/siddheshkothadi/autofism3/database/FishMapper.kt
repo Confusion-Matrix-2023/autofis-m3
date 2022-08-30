@@ -1,6 +1,5 @@
 package me.siddheshkothadi.autofism3.database
 
-import androidx.room.PrimaryKey
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 
@@ -41,8 +40,17 @@ fun UploadHistoryFishEntity.toUploadHistoryFish(): UploadHistoryFish {
         id = id,
         submissionId = submissionId,
         prediction = prediction,
-        confidence = confidence,
-        expertCorrection = expertCorrection
+        expertCorrection = expertCorrection,
+        quantity = quantity,
+        submission_timestamp = submission_timestamp,
+        longitude = longitude,
+        latitude = latitude,
+        image_url = image_url,
+        temperature = temperature,
+        humidity = humidity,
+        pressure = pressure,
+        wind_speed = wind_speed,
+        wind_direction = wind_direction
     )
 }
 
@@ -51,7 +59,16 @@ fun UploadHistoryFish.toUploadHistoryFishEntity(): UploadHistoryFishEntity {
         id = id,
         submissionId = submissionId,
         prediction = prediction,
-        confidence = confidence,
-        expertCorrection = expertCorrection
+        expertCorrection = expertCorrection,
+        quantity = quantity,
+        submission_timestamp = submission_timestamp,
+        longitude = longitude,
+        latitude = latitude,
+        image_url = image_url,
+        temperature = temperature,
+        humidity = humidity,
+        pressure = pressure,
+        wind_speed = wind_speed,
+        wind_direction = wind_direction
     )
 }

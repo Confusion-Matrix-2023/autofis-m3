@@ -29,5 +29,12 @@
     <string name="drawing_bounding_boxes">बाउंडिंग बॉक्स काढले जात आहेत</string>
     <string name="uploading_fish_data">फिश डेटा अपलोड केला जात आहे</string>
     <string name="map_view_may_not_render_properly">स्थान घेतले आहे परंतु कमी इंटरनेट कनेक्टिव्हिटीमुळे नकाशा योग्यरित्या प्रस्तुत होऊ शकत नाही!</string>
-    <string name="view_details">View Details</string>
+    <string name="view_details">तपशील पहा</string>
+    <string name="temperature">तापमान</string>
+    <string name="pressure">दाब</string>
+    <string name="humidity">आर्द्रता</string>
+    <string name="wind_speed">वाऱ्याचा वेग</string>
+    <string name="wind_direction">वाऱ्याची दिशा</string>
+    <string name="selected_box">निवडलेला बॉक्स</string>
+    <string name="nearby_fishing_zones">जवळील मासेमारी झोन</string>
 </resources>

@@ -30,4 +30,11 @@
     <string name="uploading_fish_data">చేపల డేటాను అప్‌లోడ్ చేస్తోంది</string>
     <string name="map_view_may_not_render_properly">తక్కువ ఇంటర్నెట్ కనెక్టివిటీ కారణంగా పటం సరిగ్గా రెండర్ కాకపోవచ్చు!</string>
     <string name="view_details">వివరాలను వీక్షించండి</string>
+    <string name="temperature">ఉష్ణోగ్రత</string>
+    <string name="pressure">ఒత్తిడి</string>
+    <string name="humidity">తేమ</string>
+    <string name="wind_speed">గాలి వేగం</string>
+    <string name="wind_direction">గాలి దిశ</string>
+    <string name="selected_box">ఎంచుకున్న పెట్టె</string>
+    <string name="nearby_fishing_zones">సమీపంలోని ఫిషింగ్ జోన్లు</string>
 </resources>

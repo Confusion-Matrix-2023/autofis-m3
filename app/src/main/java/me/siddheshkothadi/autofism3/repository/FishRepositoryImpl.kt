@@ -3,22 +3,18 @@ package me.siddheshkothadi.autofism3.repository
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
-import android.widget.Toast
 import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.gson.JsonObject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import me.siddheshkothadi.autofism3.FishApplication
 import me.siddheshkothadi.autofism3.database.*
 import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
-import me.siddheshkothadi.autofism3.model.weather.Weather
 import me.siddheshkothadi.autofism3.network.*
 import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.workmanager.UploadWorker
@@ -100,13 +96,6 @@ class FishRepositoryImpl(
                 setId(response.id)
             }
             Timber.i("Success $newBearerToken")
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    context,
-                    response.toString(),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
         } catch (e: HttpException) {
             val dName = localDataStore.deviceName.first()
             val dKey = localDataStore.deviceKey.first()
@@ -154,7 +143,8 @@ class FishRepositoryImpl(
 
         val requestLongitude = tempFish.longitude.toRequestBody()
         val requestLatitude = tempFish.latitude.toRequestBody()
-        val requestTimestamp = DateUtils.getSubmissionTimeStamp(tempFish.timestamp.toLong()).toRequestBody()
+        val requestTimestamp =
+            DateUtils.getSubmissionTimeStamp(tempFish.timestamp.toLong()).toRequestBody()
         val requestDeviceId = deviceId.toRequestBody()
 
 //        val response = awsFileAPI.submitDetailsWithImage(
@@ -248,10 +238,11 @@ class FishRepositoryImpl(
             showNotification(id, bitmap, 0)
             val fish = getPendingUploadByImageUri(imageUri)
 
-            val request = UploadStreamRequestBody("image/jpeg", imageFile.inputStream()) { progress ->
-                Timber.i("Upload Progress $progress")
-                showNotification(id, bitmap, progress)
-            }
+            val request =
+                UploadStreamRequestBody("image/jpeg", imageFile.inputStream()) { progress ->
+                    Timber.i("Upload Progress $progress")
+                    showNotification(id, bitmap, progress)
+                }
 
             val requestImage = MultipartBody.Part.createFormData(
                 "image_url",
@@ -264,7 +255,8 @@ class FishRepositoryImpl(
             val requestLongitude = fish.longitude.toRequestBody()
             val requestLatitude = fish.latitude.toRequestBody()
             val requestQuantity = fish.quantity.toRequestBody()
-            val requestTimestamp = DateUtils.getSubmissionTimeStamp(fish.timestamp.toLong()).toRequestBody()
+            val requestTimestamp =
+                DateUtils.getSubmissionTimeStamp(fish.timestamp.toLong()).toRequestBody()
             val requestDeviceId = deviceId.toRequestBody()
 
             val requestTemp = fish.temp?.toRequestBody()
@@ -303,9 +295,45 @@ class FishRepositoryImpl(
 
         try {
             val updatedUploadHistory = awsFileAPI.getUploadHistory(bearerToken)
+            Timber.i(updatedUploadHistory.toString())
+            val data = updatedUploadHistory.data
+            if (data.isEmpty()) return
+            val recognition = data[0].recogintion
+            val submissions = data[1].submissions
+
+            if (recognition.isNullOrEmpty() || submissions.isNullOrEmpty()) return
+
+            val list = mutableListOf<UploadHistoryFish>()
+
+            recognition.forEachIndexed { index, elem ->
+                val currentIndexRecognition = recognition[index]
+                val currentIndexSubmission = submissions[index]
+
+                list.add(
+                    UploadHistoryFish(
+                        id = currentIndexRecognition.id,
+                        submissionId = currentIndexSubmission.submissionId,
+                        prediction = currentIndexRecognition.prediction,
+                        expertCorrection = currentIndexRecognition.expertCorrection,
+
+                        quantity = currentIndexSubmission.quantity,
+                        submission_timestamp = currentIndexSubmission.submission_timestamp,
+                        longitude = currentIndexSubmission.longitude,
+                        latitude = currentIndexSubmission.latitude,
+                        image_url = if (currentIndexSubmission.image_url.isNullOrEmpty()) null else "http://20.244.36.11:8000${currentIndexSubmission.image_url}",
+                        temperature = currentIndexSubmission.temperature,
+                        humidity = currentIndexSubmission.humidity,
+                        pressure = currentIndexSubmission.pressure,
+                        wind_speed = currentIndexSubmission.wind_speed,
+                        wind_direction = currentIndexSubmission.wind_direction,
+                    )
+                )
+            }
+
+
             uploadHistoryFishDAO.deleteAll()
             uploadHistoryFishDAO.insertMany(
-                updatedUploadHistory.map {
+                list.asReversed().map {
                     it.toUploadHistoryFishEntity()
                 }
             )

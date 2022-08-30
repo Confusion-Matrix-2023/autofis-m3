@@ -42,7 +42,7 @@ fun MainNavGraph(
         Screen.Capture,
         Screen.HistoryNav,
 //        Screen.Learn,
-//        Screen.Stats,
+        Screen.Stats,
         Screen.Settings
     )
 

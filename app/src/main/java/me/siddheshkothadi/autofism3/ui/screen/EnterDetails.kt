@@ -280,7 +280,7 @@ fun EnterDetails(
                     onValueChange = {},
                     readOnly = true,
                     label = {
-                        Text("Selected Box", color = Color.Gray)
+                        Text(stringResource(R.string.selected_box), color = Color.Gray)
                     },
                     trailingIcon = {
                         IconButton(onClick = { expanded = !expanded }) {
@@ -314,7 +314,7 @@ fun EnterDetails(
                 temp?.let {
                     Row() {
                         Text(
-                            "Temperature",
+                            stringResource(R.string.temperature),
                             modifier = Modifier
                                 .weight(1f)
                                 .border(1.dp, Color.White)
@@ -330,7 +330,7 @@ fun EnterDetails(
                 pressure?.let {
                     Row() {
                         Text(
-                            "Pressure",
+                            stringResource(R.string.pressure),
                             modifier = Modifier
                                 .weight(1f)
                                 .border(1.dp, Color.White)
@@ -347,7 +347,7 @@ fun EnterDetails(
                     humidity?.let {
                         Row() {
                             Text(
-                                "Humidity",
+                                stringResource(R.string.humidity),
                                 modifier = Modifier
                                     .weight(1f)
                                     .border(1.dp, Color.White)
@@ -366,7 +366,7 @@ fun EnterDetails(
                     speed?.let {
                         Row() {
                             Text(
-                                "Wind Speed",
+                                stringResource(R.string.wind_speed),
                                 modifier = Modifier
                                     .weight(1f)
                                     .border(1.dp, Color.White)
@@ -385,7 +385,7 @@ fun EnterDetails(
                     deg?.let {
                         Row() {
                             Text(
-                                "Wind Direction",
+                                stringResource(R.string.wind_direction),
                                 modifier = Modifier
                                     .weight(1f)
                                     .border(1.dp, Color.White)

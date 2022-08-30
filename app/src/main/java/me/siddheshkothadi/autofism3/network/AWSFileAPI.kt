@@ -1,5 +1,6 @@
 package me.siddheshkothadi.autofism3.network
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
 import okhttp3.MultipartBody
@@ -43,5 +44,5 @@ interface AWSFileAPI {
     @GET("/api/userSubmission")
     suspend fun getUploadHistory(
         @Header("Authorization") bearerToken: String
-    ): List<UploadHistoryFish>
+    ): HistoryResponse
 }
