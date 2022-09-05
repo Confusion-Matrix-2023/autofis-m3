@@ -10,5 +10,10 @@ data class UploadHistoryFish(
     @SerializedName("longitude") val longitude: String,
     @SerializedName("latitude") val latitude: String,
     @SerializedName("quantity") val quantity: String,
-    @SerializedName("timestamp") val timestamp: String
+    @SerializedName("timestamp") val timestamp: String,
+    @SerializedName("temp") val temp: String? = null,
+    @SerializedName("pressure") val pressure: String? = null,
+    @SerializedName("humidity") val humidity: String? = null,
+    @SerializedName("speed") val speed: String? = null,
+    @SerializedName("deg") val deg: String? = null,
 )

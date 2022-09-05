@@ -91,6 +91,12 @@ fun EnterDetails(
     val selectedBox = remember { enterDetailsViewModel.selectedBox }
     var expanded by remember { mutableStateOf(false) }
 
+    val temp by remember { enterDetailsViewModel.temp }
+    val pressure by remember { enterDetailsViewModel.pressure }
+    val humidity by remember { enterDetailsViewModel.humidity }
+    val speed by remember { enterDetailsViewModel.speed }
+    val deg by remember { enterDetailsViewModel.deg }
+
     val paintConfig = remember {
         Paint().apply {
             color = android.graphics.Color.BLUE
@@ -283,7 +289,7 @@ fun EnterDetails(
                 )
                 DropdownMenu(
                     expanded = expanded,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.align(Alignment.Center),
                     offset = DpOffset(x = (0).dp, y = (-10).dp),
                     onDismissRequest = { expanded = false }
                 ) {
@@ -337,10 +343,112 @@ fun EnterDetails(
                 }
             }
 
+            if (!isLoading) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(28.dp)
+                ) {
+                    temp?.let {
+                        Row() {
+                            Text(
+                                stringResource(R.string.temperature),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .padding(8.dp)
+                            )
+                            Text(
+                                "$it°C", modifier = Modifier
+                                    .weight(1f)
+                                    .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                    .padding(8.dp)
+                            )
+                        }
+                    }
+                    pressure?.let {
+                        Row() {
+                            Text(
+                                stringResource(R.string.pressure),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .padding(8.dp)
+                            )
+                            Text(
+                                "$it hPa", modifier = Modifier
+                                    .weight(1f)
+                                    .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                    .padding(8.dp)
+                            )
+                        }
+                        humidity?.let {
+                            Row() {
+                                Text(
+                                    stringResource(R.string.humidity),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(8.dp)
+                                )
+                                Text(
+                                    "$it%",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                        .padding(8.dp)
+                                )
+                            }
+                        }
+                        speed?.let {
+                            Row() {
+                                Text(
+                                    stringResource(R.string.wind_speed),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(8.dp)
+                                )
+                                Text(
+                                    "$it m/sec",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                        .padding(8.dp)
+                                )
+                            }
+                        }
+                        deg?.let {
+                            Row() {
+                                Text(
+                                    stringResource(R.string.wind_direction),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(8.dp)
+                                )
+                                Text(
+                                    "$it°",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, MaterialTheme.colorScheme.onSurface)
+                                        .padding(8.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
             Button(
                 modifier = Modifier
                     .width(300.dp)
-                    .padding(vertical = 24.dp),
+                    .padding(bottom = 24.dp, top = 12.dp),
                 onClick = {
                     try {
                         val quantityToInt = quantity.toInt()

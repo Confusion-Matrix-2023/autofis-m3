@@ -124,8 +124,8 @@ class FishRepositoryImpl(
     }
 
     override suspend fun getWeatherData(lat: String, lon: String): JsonObject {
-//        return weatherAPI.getWeatherData(lat,lon,"2851a90b716da669a9118af4c2b59341")
-        return weatherAPI.getWeatherData()
+        val url = "https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=2851a90b716da669a9118af4c2b59341"
+        return weatherAPI.getWeatherData(url)
     }
 
     override val deviceId: Flow<String>
@@ -254,7 +254,7 @@ class FishRepositoryImpl(
             }
 
             val requestImage = MultipartBody.Part.createFormData(
-                "image_url",
+                "image",
                 imageFile.name,
                 request
             )
@@ -263,16 +263,35 @@ class FishRepositoryImpl(
 
             val requestLongitude = fish.longitude.toRequestBody()
             val requestLatitude = fish.latitude.toRequestBody()
-            val requestTimestamp = DateUtils.getSubmissionTimeStamp(fish.timestamp.toLong()).toRequestBody()
-            val requestDeviceId = deviceId.toRequestBody()
+            val requestQuantity = fish.quantity.toRequestBody()
+            val requestTimestamp = fish.timestamp.toRequestBody()
+            val requestTemp = fish.temp?.toRequestBody()
+            val requestPressure = fish.pressure?.toRequestBody()
+            val requestHumidity = fish.humidity?.toRequestBody()
+            val requestSpeed = fish.speed?.toRequestBody()
+            val requestDegree = fish.deg?.toRequestBody()
 
-            awsFileAPI.submitDetailsWithImage(
+//            awsFileAPI.submitDetailsWithImage(
+//                bearerToken,
+//                requestImage,
+//                requestLongitude,
+//                requestLatitude,
+//                requestDeviceId,
+//                requestTimestamp
+//            )
+
+            fileAPI.uploadData(
                 bearerToken,
                 requestImage,
                 requestLongitude,
                 requestLatitude,
-                requestDeviceId,
-                requestTimestamp
+                requestQuantity,
+                requestTimestamp,
+                requestTemp,
+                requestPressure,
+                requestHumidity,
+                requestSpeed,
+                requestDegree
             )
 
             deleteFish(fish)

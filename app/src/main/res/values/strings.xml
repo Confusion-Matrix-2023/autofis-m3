@@ -30,4 +30,11 @@
     <string name="uploading_fish_data">Uploading Fish Data</string>
     <string name="map_view_may_not_render_properly">MapView may not render properly because of low internet connectivity!</string>
     <string name="view_details">View Details</string>
+    <string name="temperature">Temperature</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind_speed">Wind Speed</string>
+    <string name="wind_direction">Wind Direction</string>
+    <string name="selected_box">Selected Box</string>
+    <string name="nearby_fishing_zones">Nearby fishing zones</string>
 </resources>

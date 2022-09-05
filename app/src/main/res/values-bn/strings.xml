@@ -30,4 +30,11 @@
     <string name="uploading_fish_data">আবদ্ধ বাক্স অঙ্কন</string>
     <string name="map_view_may_not_render_properly">কম ইন্টারনেট সংযোগের কারণে মানচিত্র সঠিকভাবে রেন্ডার নাও হতে পারে!</string>
     <string name="view_details">বিস্তারিত দেখুন</string>
+    <string name="temperature">তাপমাত্রা</string>
+    <string name="pressure">চাপ</string>
+    <string name="humidity">আর্দ্রতা</string>
+    <string name="wind_speed">বাতাসের গতি</string>
+    <string name="wind_direction">বায়ু দিক</string>
+    <string name="selected_box">নির্বাচিত বক্স</string>
+    <string name="nearby_fishing_zones">কাছাকাছি মাছ ধরার অঞ্চল</string>
 </resources>

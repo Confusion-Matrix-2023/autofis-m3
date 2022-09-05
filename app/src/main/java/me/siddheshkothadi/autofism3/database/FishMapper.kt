@@ -10,7 +10,12 @@ fun PendingUploadFishEntity.toPendingUploadFish(): PendingUploadFish {
         latitude = latitude,
         quantity = quantity,
         timestamp = timestamp,
-        workId = workId
+        workId = workId,
+        temp = temp,
+        pressure = pressure,
+        humidity = humidity,
+        speed = speed,
+        deg = deg
     )
 }
 
@@ -21,7 +26,12 @@ fun PendingUploadFish.toPendingUploadFishEntity(): PendingUploadFishEntity {
         latitude = latitude,
         quantity = quantity,
         timestamp = timestamp,
-        workId = workId
+        workId = workId,
+        temp = temp,
+        pressure = pressure,
+        humidity = humidity,
+        speed = speed,
+        deg = deg
     )
 }
 
@@ -33,7 +43,12 @@ fun UploadHistoryFishEntity.toUploadHistoryFish(): UploadHistoryFish {
         longitude = longitude,
         latitude = latitude,
         quantity = quantity,
-        timestamp = timestamp
+        timestamp = timestamp,
+        temp = temp,
+        pressure = pressure,
+        humidity = humidity,
+        speed = speed,
+        deg = deg
     )
 }
 
@@ -45,6 +60,11 @@ fun UploadHistoryFish.toUploadHistoryFishEntity(): UploadHistoryFishEntity {
         longitude = longitude,
         latitude = latitude,
         quantity = quantity,
-        timestamp = timestamp
+        timestamp = timestamp,
+        temp = temp,
+        pressure = pressure,
+        humidity = humidity,
+        speed = speed,
+        deg = deg
     )
 }

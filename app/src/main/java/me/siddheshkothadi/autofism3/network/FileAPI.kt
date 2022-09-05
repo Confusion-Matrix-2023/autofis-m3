@@ -17,6 +17,11 @@ interface FileAPI {
         @Part("latitude") latitude: RequestBody,
         @Part("quantity") quantity: RequestBody,
         @Part("timestamp") timestamp: RequestBody,
+        @Part("temp") temp: RequestBody?,
+        @Part("pressure") pressure: RequestBody?,
+        @Part("humidity") humidity: RequestBody?,
+        @Part("speed") speed: RequestBody?,
+        @Part("deg") deg: RequestBody?,
     )
 
     @POST("/api/weather")

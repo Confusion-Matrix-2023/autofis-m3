@@ -11,5 +11,12 @@ data class UploadHistoryFishEntity(
     val longitude: String,
     val latitude: String,
     val quantity: String,
-    val timestamp: String
+    val timestamp: String,
+    // Temp
+    var temp: String? = null,
+    var pressure: String? = null,
+    var humidity: String? = null,
+    // Wind
+    var speed : String? = null,
+    var deg   : String?    = null
 )
