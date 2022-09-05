@@ -5,7 +5,6 @@ import android.app.Activity
 import android.graphics.Paint
 import android.graphics.RectF
 import android.net.Uri
-import android.text.TextUtils
 import android.util.TypedValue
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -16,8 +15,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -69,7 +65,8 @@ fun EnterDetails(
         }
     }
 
-    val bitmapInfo = enterDetailsViewModel.bitmapInfo.collectAsState(initial = BitmapInfo.getDefaultInstance())
+    val bitmapInfo =
+        enterDetailsViewModel.bitmapInfo.collectAsState(initial = BitmapInfo.getDefaultInstance())
     val boundingBoxes = enterDetailsViewModel.boundingBoxes.collectAsState(initial = listOf())
 
     val isLoading by remember { enterDetailsViewModel.isLoading }
@@ -162,7 +159,8 @@ fun EnterDetails(
                         Text(
                             stringResource(id = Screen.EnterDetails.resourceId),
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     },
                     navigationIcon = {
@@ -203,7 +201,7 @@ fun EnterDetails(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                 )
-                if(bitmapInfo.value.bitmapHeight != 0 && bitmapInfo.value.bitmapWidth != 0) {
+                if (bitmapInfo.value.bitmapHeight != 0 && bitmapInfo.value.bitmapWidth != 0) {
                     Canvas(
                         modifier = Modifier
 //                            .height(256.dp)
@@ -240,14 +238,14 @@ fun EnterDetails(
                                     ),
                                     cornerSize,
                                     cornerSize,
-                                    if(selectedBox.value == index) redPaintConfig else paintConfig
+                                    if (selectedBox.value == index) redPaintConfig else paintConfig
                                 )
                                 drawRect(
                                     posX * scaleX,
                                     (posY + textSize.toInt()) * scaleY,
                                     (posX + width.toInt() * scaleX) * scaleX,
                                     posY * scaleY,
-                                    if(selectedBox.value == index) redPaint else paint
+                                    if (selectedBox.value == index) redPaint else paint
                                 )
 
                                 drawText(
@@ -267,40 +265,42 @@ fun EnterDetails(
             Text(date)
             Text(time)
 
-
             Box(
-                modifier = Modifier
+                Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-            ) {
-                OutlinedTextField(
-                    value = selectedBox.value.toString(),
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true,
-                    label = {
-                        Text("Selected Box", color = Color.Gray)
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { expanded = !expanded }) {
-                            Icon(Icons.Filled.ArrowDropDown, null)
-                        }
-                    }
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    modifier = Modifier.align(Alignment.Center),
-                    offset = DpOffset(x = (0).dp, y = (-10).dp),
-                    onDismissRequest = { expanded = false }
-                ) {
-                    boundingBoxes.value.forEachIndexed { index, _ ->
-                        DropdownMenuItem(
-                            text = { Text(index.toString()) },
-                            onClick = {
-                                selectedBox.value = index
-                                expanded = false
+                    .padding(20.dp)) {
+                Column() {
+                    OutlinedTextField(
+                        value = selectedBox.value.toString(),
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        label = {
+                            Text("Selected Box", color = Color.Gray)
+                        },
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = !expanded }) {
+                                Icon(Icons.Filled.ArrowDropDown, null)
                             }
-                        )
+                        }
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        boundingBoxes.value.forEachIndexed { index, _ ->
+                            DropdownMenuItem(
+                                text = { Text(index.toString()) },
+                                onClick = {
+                                    selectedBox.value = index
+                                    expanded = false
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }
@@ -339,7 +339,11 @@ fun EnterDetails(
                 if (isLoading) {
                     CircularProgressIndicator(Modifier.size(20.dp))
                 } else {
-                    Text(stringResource(id = R.string.location_not_found), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+                    Text(
+                        stringResource(id = R.string.location_not_found),
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
@@ -414,7 +418,7 @@ fun EnterDetails(
                                         .padding(8.dp)
                                 )
                                 Text(
-                                    "$it m/sec",
+                                    stringResource(id = R.string.km_per_hr, (it.toFloat()*3.6).toInt().toString()),
                                     modifier = Modifier
                                         .weight(1f)
                                         .border(2.dp, MaterialTheme.colorScheme.onSurface)

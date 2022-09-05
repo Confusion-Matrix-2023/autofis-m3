@@ -37,4 +37,8 @@
     <string name="wind_direction">वाऱ्याची दिशा</string>
     <string name="selected_box">निवडलेला बॉक्स</string>
     <string name="nearby_fishing_zones">जवळील मासेमारी झोन</string>
+    <string name="km_per_hr">%1$s किमी/तास</string>
+    <string name="degree_celsius">%1$s °C</string>
+    <string name="humidity_percent">%1$s \%%</string>
+    <string name="wind_deg">%1$s °</string>
 </resources>

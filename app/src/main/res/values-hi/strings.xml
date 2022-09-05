@@ -37,4 +37,8 @@
     <string name="wind_direction">हवा की दिशा</string>
     <string name="selected_box">चयनित बॉक्स</string>
     <string name="nearby_fishing_zones">आस-पास के मछली पकड़ने के क्षेत्र</string>
+    <string name="km_per_hr">%1$s किमी/घंटा</string>
+    <string name="degree_celsius">%1$s °C</string>
+    <string name="humidity_percent">%1$s \%%</string>
+    <string name="wind_deg">%1$s °</string>
 </resources>

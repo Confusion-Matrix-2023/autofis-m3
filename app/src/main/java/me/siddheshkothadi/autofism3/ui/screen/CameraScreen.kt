@@ -49,7 +49,7 @@ import java.util.*
 import kotlin.math.min
 import kotlin.random.Random
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CameraScreen(
     navController: NavHostController,
@@ -88,6 +88,9 @@ fun CameraScreen(
     var bitmap: Bitmap? by remember {
         mutableStateOf(null)
     }
+
+    var expanded: Boolean by remember { mutableStateOf(false) }
+    var check: Boolean by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier
@@ -242,7 +245,7 @@ fun CameraScreen(
                         previewView
                     },
                     modifier = Modifier
-                        .aspectRatio(1f)
+//                        .aspectRatio(1f)
                         .fillMaxSize(),
                 )
             }
@@ -280,8 +283,22 @@ fun CameraScreen(
                     stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.titleLarge
                 )
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(Icons.Filled.MoreVert, "")
+                Box() {
+                    Column() {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Filled.MoreVert, "")
+                        }
+                        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            DropdownMenuItem(text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Checkbox(checked = check, onCheckedChange = {check = !check})
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Use GPU", style = MaterialTheme.typography.titleMedium)
+                                    Spacer(Modifier.width(8.dp))
+                                }
+                            }, onClick = {})
+                        }
+                    }
                 }
             }
 

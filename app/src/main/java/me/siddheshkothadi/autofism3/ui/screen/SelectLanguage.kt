@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.ArrowRightAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import me.siddheshkothadi.autofism3.Constants
 import me.siddheshkothadi.autofism3.MainViewModel
 import me.siddheshkothadi.autofism3.R
+import me.siddheshkothadi.autofism3.ui.nav.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,58 +32,67 @@ fun SelectLanguage(
     val selectedLanguage by remember { mainViewModel.selectedLanguage }
     val availableLanguages = remember { Constants.availableLanguages }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .padding(24.dp),
-    ) {
-        Text(
-            stringResource(id = R.string.select_language),
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(availableLanguages) {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable {
-                            mainViewModel.onRadioButtonSelected(context, it) {
-                                recreateActivity()
-                            }
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = selectedLanguage == it,
-                        onClick = {
-                            mainViewModel.onRadioButtonSelected(context, it) {
-                                recreateActivity()
-                            }
-                        })
-                    Text(
-                        it.selectText,
-                        modifier = Modifier.padding(horizontal = 12.dp),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+    Scaffold(
+        topBar = {
+            Surface(
+                tonalElevation = 3.dp,
+                modifier = Modifier.systemBarsPadding()
+            ) {
+                LargeTopAppBar(
+                    title = {
+                        Text(stringResource(id = Screen.SelectLanguage.resourceId))
+                    },
+                )
             }
         }
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
-            Button(onClick = {
-                mainViewModel.onLanguageChosen {
-                    recreateActivity()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+                .padding(12.dp)
+        ) {
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(availableLanguages) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable {
+                                mainViewModel.onRadioButtonSelected(context, it) {
+                                    recreateActivity()
+                                }
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedLanguage == it,
+                            onClick = {
+                                mainViewModel.onRadioButtonSelected(context, it) {
+                                    recreateActivity()
+                                }
+                            })
+                        Text(
+                            it.selectText,
+                            modifier = Modifier.padding(horizontal = 12.dp),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
-            }) {
-                Text(stringResource(id = R.string.select))
-                Spacer(Modifier.width(4.dp))
-                Icon(Icons.Filled.ArrowRightAlt, "")
+            }
+            Box(Modifier.systemBarsPadding().padding(12.dp).fillMaxWidth(), contentAlignment = Alignment.BottomEnd) {
+                Button(onClick = {
+                    mainViewModel.onLanguageChosen {
+                        recreateActivity()
+                    }
+                }) {
+                    Text(stringResource(id = R.string.select))
+                    Spacer(Modifier.width(4.dp))
+                    Icon(Icons.Filled.ArrowRightAlt, "")
+                }
             }
         }
     }
+
 }

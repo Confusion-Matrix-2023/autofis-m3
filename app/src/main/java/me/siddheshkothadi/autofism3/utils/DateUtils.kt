@@ -38,6 +38,13 @@ object DateUtils {
         return simpleDateFormat.format(timestampString.toLong())
     }
 
+    fun getDateWithoutYear(context: Context, timestampString: String): String {
+        val currentLanguageLocale = getCurrentLanguageLocale(context)
+        if (timestampString.isBlank()) return context.getString(R.string.loading)
+        val simpleDateFormat = SimpleDateFormat("dd MMM", Locale(currentLanguageLocale))
+        return simpleDateFormat.format(timestampString.toLong())
+    }
+
     fun getTime(context: Context, timestampString: String): String {
         val currentLanguageLocale = getCurrentLanguageLocale(context)
         if (timestampString.isBlank()) return context.getString(R.string.loading)
