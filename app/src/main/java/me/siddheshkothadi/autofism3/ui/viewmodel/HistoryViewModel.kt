@@ -30,6 +30,10 @@ class HistoryViewModel @Inject constructor(
     val uploadHistory: Flow<List<UploadHistoryFish>>
         get() = fishRepository.getUploadHistory()
 
+    init {
+        fetchUploadHistory()
+    }
+
     fun fetchUploadHistory() {
         viewModelScope.launch {
             try {

@@ -325,10 +325,10 @@ fun EnterDetails(
             )
 
             if (latitude.isNotBlank() && longitude.isNotBlank()) {
-                if(!isConnectedToNetwork) {
-                    Text(stringResource(R.string.map_view_may_not_render_properly), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
-                    Spacer(Modifier.height(12.dp))
-                }
+//                if(!isConnectedToNetwork) {
+//                    Text(stringResource(R.string.map_view_may_not_render_properly), color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center)
+//                    Spacer(Modifier.height(12.dp))
+//                }
                 MapView(
                     latitude, longitude,
                     Modifier

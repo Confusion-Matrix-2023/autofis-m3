@@ -3,28 +3,24 @@ package me.siddheshkothadi.autofism3.repository
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
-import android.widget.Toast
 import androidx.work.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.gson.JsonObject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
+import me.siddheshkothadi.autofism3.BuildConfig
 import me.siddheshkothadi.autofism3.FishApplication
 import me.siddheshkothadi.autofism3.database.*
 import me.siddheshkothadi.autofism3.datastore.BitmapInfo
 import me.siddheshkothadi.autofism3.datastore.LocalDataStore
 import me.siddheshkothadi.autofism3.model.PendingUploadFish
 import me.siddheshkothadi.autofism3.model.UploadHistoryFish
-import me.siddheshkothadi.autofism3.model.weather.Weather
 import me.siddheshkothadi.autofism3.network.*
 import me.siddheshkothadi.autofism3.utils.DateUtils
 import me.siddheshkothadi.autofism3.workmanager.UploadWorker
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import retrofit2.HttpException
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -89,42 +85,42 @@ class FishRepositoryImpl(
         Timber.tag("Sid").i(bearerToken)
         if (bearerToken.isNotBlank()) return bearerToken
         localDataStore.setDeviceKeyNameAndBearerToken()
-        val newBearerToken = localDataStore.bearerToken.first()
-        Timber.tag("Sid").i(newBearerToken)
-        try {
-            val response = awsFileAPI.checkDevice(newBearerToken)
-            Timber.tag("Sid").i(response.toString())
-            localDataStore.apply {
-                setDeviceKey(response.deviceKey)
-                setDeviceName(response.deviceName)
-                setId(response.id)
-            }
-            Timber.i("Success $newBearerToken")
-            withContext(Dispatchers.Main) {
-                Toast.makeText(
-                    context,
-                    response.toString(),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        } catch (e: HttpException) {
-            val dName = localDataStore.deviceName.first()
-            val dKey = localDataStore.deviceKey.first()
-            val response = awsFileAPI.addNewDevice(AddDeviceRequest(dName, dKey))
-            Timber.i(response.toString())
-            localDataStore.apply {
-                setDeviceKey(response.deviceKey)
-                setDeviceName(response.deviceName)
-                setId(response.id)
-            }
-            Timber.i("Failure $newBearerToken")
-        }
+        //        Timber.tag("Sid").i(newBearerToken)
+//        try {
+//            val response = awsFileAPI.checkDevice(newBearerToken)
+//            Timber.tag("Sid").i(response.toString())
+//            localDataStore.apply {
+//                setDeviceKey(response.deviceKey)
+//                setDeviceName(response.deviceName)
+//                setId(response.id)
+//            }
+//            Timber.i("Success $newBearerToken")
+//            withContext(Dispatchers.Main) {
+//                Toast.makeText(
+//                    context,
+//                    response.toString(),
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
+//        } catch (e: HttpException) {
+//            val dName = localDataStore.deviceName.first()
+//            val dKey = localDataStore.deviceKey.first()
+//            val response = awsFileAPI.addNewDevice(AddDeviceRequest(dName, dKey))
+//            Timber.i(response.toString())
+//            localDataStore.apply {
+//                setDeviceKey(response.deviceKey)
+//                setDeviceName(response.deviceName)
+//                setId(response.id)
+//            }
+//            Timber.i("Failure $newBearerToken")
+//        }
 
-        return newBearerToken
+        return localDataStore.bearerToken.first()
     }
 
     override suspend fun getWeatherData(lat: String, lon: String): JsonObject {
-        val url = "https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=2851a90b716da669a9118af4c2b59341"
+        val appID = BuildConfig.OPEN_WEATHER_APP_ID
+        val url = "https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appID}"
         return weatherAPI.getWeatherData(url)
     }
 
