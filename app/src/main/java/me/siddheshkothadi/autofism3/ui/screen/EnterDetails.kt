@@ -268,7 +268,9 @@ fun EnterDetails(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)) {
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 20.dp)
+            ) {
                 Column() {
                     OutlinedTextField(
                         value = selectedBox.value.toString(),
@@ -288,8 +290,8 @@ fun EnterDetails(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
                         modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 8.dp)
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
                     ) {
                         boundingBoxes.value.forEachIndexed { index, _ ->
                             DropdownMenuItem(
@@ -321,7 +323,8 @@ fun EnterDetails(
                 isError = quantityError,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 18.dp)
             )
 
             if (latitude.isNotBlank() && longitude.isNotBlank()) {
