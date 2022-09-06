@@ -20,10 +20,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import me.siddheshkothadi.autofism3.MainViewModel
-import me.siddheshkothadi.autofism3.ui.screen.EmptyScreen
-import me.siddheshkothadi.autofism3.ui.screen.History
-import me.siddheshkothadi.autofism3.ui.screen.SelectLanguage
-import me.siddheshkothadi.autofism3.ui.screen.SettingsScreen
+import me.siddheshkothadi.autofism3.ui.screen.*
 import me.siddheshkothadi.autofism3.ui.viewmodel.HistoryViewModel
 import timber.log.Timber
 
@@ -42,7 +39,7 @@ fun MainNavGraph(
         Screen.Capture,
         Screen.HistoryNav,
 //        Screen.Learn,
-//        Screen.Stats,
+        Screen.Stats,
         Screen.Settings
     )
 
@@ -120,7 +117,7 @@ fun MainNavGraph(
                 EmptyScreen()
             }
             composable(Screen.Stats.route) {
-                EmptyScreen()
+                StatsScreen()
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(navController, mainViewModel, recreateActivity)

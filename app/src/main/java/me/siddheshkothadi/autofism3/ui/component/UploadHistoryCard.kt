@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PinDrop
@@ -82,12 +83,14 @@ fun UploadHistoryCard(
                     }
                 }
                 if(fish.latitude.isNotBlank() && fish.longitude.isNotBlank()) {
-                    IconButton(onClick = {
+                    Button(onClick = {
                         val gmmIntentUri = Uri.parse("geo:${fish.latitude},${fish.longitude}?q=${fish.latitude},${fish.longitude}")
                         val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                         mapIntent.setPackage("com.google.android.apps.maps")
                         context.startActivity(mapIntent)
-                    }) {
+                    }, modifier = Modifier
+                        .size(42.dp), shape = CircleShape,
+                        contentPadding = PaddingValues(0.dp),) {
                         Icon(Icons.Filled.PinDrop, contentDescription = null)
                     }
                 }

@@ -12,6 +12,7 @@ import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
 import me.siddheshkothadi.autofism3.ui.nav.MainNavGraph
+import me.siddheshkothadi.autofism3.ui.screen.StatsScreen
 import me.siddheshkothadi.autofism3.ui.theme.AutoFISM3Theme
 import me.siddheshkothadi.autofism3.utils.setAppLocale
 import javax.inject.Inject
