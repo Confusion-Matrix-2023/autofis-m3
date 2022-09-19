@@ -9,14 +9,9 @@ Automatic Identification of Fish Species
 	
 Problem/Current Situation: INCOIS is providing Marine Fishery Advisory Services to the fishermen. To evaluate it’s accuracy and in order to develop species-specific advisories it is necessary to collect the fish-catch information at the species level. While fisherfolk are supportive to these efforts, often species level catch reporting is having hinderances due to several reasons pertaining to manual efforts which results to low or erroneous reporting. Solution Needed: Hackathon teams may develop AI-ML based tool for image-based identification of fish-species found in the Indian seas. The images of fishes may be taken from online image searches. Similar tools are provided in reference links below. INCOIS will be able to use this for it’s fishermen feedback app, where fishermen need to take a photo of fishes caught and fish-identification will be done through code, minimizing the manual intervention.
 
-### Organization
-Indian National Centre for Ocean Information Services (INCOIS), Ministry of Earth Sciences (MoES)
-
-### Category
-Software
-
-### Domain Bucket
-Agriculture, FoodTech & Rural Development
+| Organization | Category | Domain Bucket |
+| :---: | :---: | :---: |
+| Indian National Centre for Ocean Information Services (INCOIS), Ministry of Earth Sciences (MoES) | Software | Agriculture, FoodTech & Rural Development |
 
 ## Setup
 Add your API Keys in <code>local.properties</code> file.
