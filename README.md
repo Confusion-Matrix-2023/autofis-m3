@@ -1,5 +1,4 @@
-# AutoFiS
-Automatic Identification of Fish Species
+# AutoFiS: Automatic Identification of Fish Species
 
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000)](https://youtu.be/Ba9CgKhO2lc)
 
