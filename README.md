@@ -20,4 +20,10 @@ MAPS_API_KEY=<YOUR_MAPS_API_KEY>
 OPEN_WEATHER_APP_ID=<YOUR_OPEN_WEATHER_APP_ID>
 ```
 
-
+## Screenshots
+| | |
+| :---: | :---: |
+| <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/AutoFIS.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Capture.png?raw=true" /> |
+| <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Enter%20Details.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Enter%20Details-1.png?raw=true" /> |
+| <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/History.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Settings.png?raw=true" /> |
+| <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Stats.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Stats-1.png?raw=true" /> |
