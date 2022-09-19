@@ -1,7 +1,7 @@
 # AutoFiS
 Automatic Identification of Fish Species
 
-[![YouTube](https://img.shields.io/badge/YouTube-FF0000)](https://leetcode.com/siddhesh_kt)
+[![YouTube](https://img.shields.io/badge/YouTube-FF0000)](https://youtu.be/Ba9CgKhO2lc)
 
 <a href="https://youtu.be/Ba9CgKhO2lc"><img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Poster.png?raw=true" /></a>
 
