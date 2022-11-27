@@ -11,7 +11,7 @@ INCOIS is providing Marine Fishery Advisory Services to the fishermen. To evalua
 ## Team
 | Member name | Profile url |
 | :---: | :---: |
-| Atharva Parikh | [@aaparikh](https://github.com/aaparikh) |
+| Atharva Parikh | [Atharva's github](https://github.com/aaparikh) |
 | Ketaki Aloni | [Ketaki's github](https://github.com/ketaaaki) |
 | Siddhesh Kothadi | [Siddhesh's github](https://github.com/siddheshkothadi) |
 | Vaishnavi Joshi | [Vaishnavi's github](https://github.com/vaishnavi-30-beep) |
