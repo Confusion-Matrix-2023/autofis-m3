@@ -8,6 +8,16 @@
 	
 INCOIS is providing Marine Fishery Advisory Services to the fishermen. To evaluate it’s accuracy and in order to develop species-specific advisories it is necessary to collect the fish-catch information at the species level. While fisherfolk are supportive to these efforts, often species level catch reporting is having hinderances due to several reasons pertaining to manual efforts which results to low or erroneous reporting. Solution Needed: Hackathon teams may develop AI-ML based tool for image-based identification of fish-species found in the Indian seas. The images of fishes may be taken from online image searches. Similar tools are provided in reference links below. INCOIS will be able to use this for it’s fishermen feedback app, where fishermen need to take a photo of fishes caught and fish-identification will be done through code, minimizing the manual intervention.
 
+## Team
+| Member name | Profile url |
+| :---: | :---: |
+| Atharva Parikh | [@aaparikh](https://github.com/aaparikh) |
+| Ketaki Aloni | [Ketaki's github](https://github.com/ketaaaki) |
+| Siddhesh Kothadi | [Siddhesh's github](https://github.com/siddheshkothadi) |
+| Vaishnavi Joshi | [Vaishnavi's github](https://github.com/vaishnavi-30-beep) |
+| Vipulkumar Rajput | [Vipul's github](https://github.com/vipul-rajput) |
+| Yog Dharaskar | [Yog's linkedin](https://www.linkedin.com/in/yog-dharaskar/) |
+
 | Organization | Category | Domain Bucket |
 | :---: | :---: | :---: |
 | Indian National Centre for Ocean Information Services (INCOIS), Ministry of Earth Sciences (MoES) | Software | Agriculture, FoodTech & Rural Development |
