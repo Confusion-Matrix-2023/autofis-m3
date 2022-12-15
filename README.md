@@ -36,3 +36,8 @@ OPEN_WEATHER_APP_ID=<YOUR_OPEN_WEATHER_APP_ID>
 | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Enter%20Details.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Enter%20Details-1.png?raw=true" /> |
 | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/History.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Settings.png?raw=true" /> |
 | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Stats.png?raw=true" /> | <img src="https://github.com/Confusion-Matrix-2023/autofis-m3/blob/screenshots/Stats-1.png?raw=true" /> |
+
+## Note
+
+This repository contains a demonstration of an application that was built during the SIH. It features offline object detection for fishes, offline caching, and upload scheduling with WorkManager. However, it is currently unable to perform fish classification because the classification model has not yet been hosted. We plan to integrate this functionality into the application in the future. Thank you for your interest.
+
